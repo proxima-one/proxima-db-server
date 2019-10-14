@@ -1,0 +1,17 @@
+{
+  "name": "proxima-db-server",
+  "version": "0.0.3",
+  "description": "",
+  "main": "./src/index.js",
+  "scripts": {
+    "start": "node ./src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@grpc/proto-loader": "^0.5.2",
+    "grpc": "^1.24.0",
+    "proxima-db": "^0.6.3"
+  }
+}

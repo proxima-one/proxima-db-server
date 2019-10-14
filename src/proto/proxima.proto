@@ -1,0 +1,111 @@
+syntax = "proto3";
+
+service ProximaService {
+
+  rpc Get (GetRequest) returns (GetResponse) {}
+  rpc Put (PutRequest) returns (PutResponse) {}
+  rpc Query(QueryRequest) returns (QueryResponse) {}
+  rpc Remove (RemoveRequest) returns (RemoveResponse) {}
+  rpc Batch (BatchRequest) returns (BatchResponse) {}
+
+  rpc Create (CreateRequest) returns (CreateResponse) {}
+  rpc Open (OpenRequest) returns (OpenResponse) {}
+  rpc Close (CloseRequest) returns (CloseResponse) {}
+  rpc TableRemove(TableRemoveRequest) returns (TableRemoveResponse) {}
+}
+
+message OpenRequest {
+  string name = 1;
+}
+
+message OpenResponse {
+  bool confirmation = 1;
+}
+
+message TableRemoveRequest {
+  string name = 1;
+}
+
+message TableRemoveResponse {
+  bool confirmation = 1;
+}
+
+message CloseRequest {
+  string name = 1;
+}
+
+message CloseResponse {
+  bool confirmation = 1;
+}
+
+message CreateRequest {
+  string name = 1;
+}
+
+message CreateResponse {
+  bool confirmation = 1;
+  string name = 2;
+}
+
+message GetRequest {
+  string name = 1;
+  bytes key = 2;
+  bool prove = 3;
+}
+
+message RemoveRequest {
+  string name = 1;
+  bytes key = 2;
+  bool prove = 3;
+}
+
+message PutRequest {
+  string name = 1;
+  bytes key = 2;
+  bytes value = 3;
+  bool prove = 4;
+}
+
+message BatchRequest {
+  bool prove = 1;
+  repeated PutRequest requests = 2;
+}
+
+message BatchResponse {
+  repeated PutResponse responses = 1;
+}
+
+message RemoveResponse {
+  bytes value = 1;
+  bytes proof = 2;
+  bytes root = 3;
+}
+
+message PutResponse {
+ bytes proof = 1;
+ bytes root = 2;
+}
+
+message QueryRequest {
+  string name = 1;
+  string query = 2;
+  bool prove = 3;
+}
+
+message QueryResponse {
+  repeated GetResponse responses = 1;
+}
+
+message GetResponse {
+ bytes value = 1;
+ bytes proof = 2;
+ bytes root = 3;
+}
+
+message Root {
+  bytes root = 1;
+}
+
+message Proof {
+  bytes proof = 1;
+}
