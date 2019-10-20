@@ -1,7 +1,14 @@
 
 
 function parseProof(proof) {
-  str = JSON.stringify(proof)
+  let str = ""
+  if (proof) {
+    let p = proof
+    str = JSON.stringify(proof)
+    let pr = JSON.parse(str)
+    pr.key_value = Buffer.from(p.key_value).toString('hex')
+    str = JSON.stringify(pr)
+  }
   bytes = toBytes(str)
   return bytes
 }

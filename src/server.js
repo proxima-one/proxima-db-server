@@ -83,6 +83,8 @@ constructor(args) {
          //console.log("Request: ", request)
          let response = await table.put(request.key, request.value, request.prove)
          //console.log("Proof response: ", response)
+         //console.log(response.root.length)
+         //console.log(response)
          let reply = {
               root: response.root,
               proof: parseProof(response.proof)
@@ -103,7 +105,8 @@ constructor(args) {
          let request = call.request
          let table = await this.db.get(request.name)
          let response = await table.get(request.key, request.prove)
-         //console.log("Proof response: ", response)
+         //console.log("Proof response: ", response.root)
+         //console.log(response)
          let reply = {
              value: response.value,
              root: response.root,
@@ -127,11 +130,21 @@ constructor(args) {
        },
        batch: async (call, callback) => {
          let request = call.request
-         let entries = request.entries
+         const entries = request.requests
          let prove = request.prove
-         let table = await this.db.get(request.name)
-         let responses = await table.batch(this.db.get(request.name), request.prove)
-         callback(null, responses)
+         for (var entry of entries) {
+           entry.prove = false
+         }
+
+        let responses = await this.db.batch(entries)
+        let replies = new Array()
+            for (var response in responses) {
+              replies.push({
+                proof: parseProof(response.proof),
+                root: response.root,
+            });
+         }
+           callback(null, replies)
        },
        query: async (call, callback) => {
          let request = call.request
@@ -142,7 +155,7 @@ constructor(args) {
               reply.push({
                 value: response.value,
                 proof: parseProof(response.proof),
-                root: response.root
+                root: response.root,
               });
             }
            callback(null, reply)
