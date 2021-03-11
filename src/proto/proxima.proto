@@ -8,11 +8,67 @@ service ProximaService {
   rpc Remove (RemoveRequest) returns (RemoveResponse) {}
   rpc Batch (BatchRequest) returns (BatchResponse) {}
 
+  rpc Checkout (CheckoutRequest) returns (CheckoutResponse) {}
+  rpc Commit (CommitRequest) returns (CommitResponse) {}
+  rpc Compact (CompactRequest) returns (CompactResponse) {}
+  rpc Scan (ScanRequest) returns (ScanResponse){}
+  rpc Stat (StatRequest) returns (StatResponse) {}
+
   rpc Create (CreateRequest) returns (CreateResponse) {}
   rpc Open (OpenRequest) returns (OpenResponse) {}
   rpc Close (CloseRequest) returns (CloseResponse) {}
   rpc TableRemove(TableRemoveRequest) returns (TableRemoveResponse) {}
+
+
 }
+
+message ScanRequest {
+  string name = 1;
+  int32 first = 2;
+  int32 last = 3;
+  int32 limit = 4;
+  bool prove = 5;
+}
+
+message ScanResponse {
+repeated GetResponse responses = 1;
+}
+
+message CheckoutRequest {
+  string name = 1;
+}
+
+message CheckoutResponse {
+  bool confirmation = 1;
+}
+
+message CommitRequest {
+  string name = 1;
+}
+
+message CommitResponse {
+  bool confirmation = 1;
+}
+
+message CompactRequest {
+  string name = 1;
+}
+
+message CompactResponse {
+  bool confirmation = 1;
+}
+
+message StatRequest {
+  string name = 1;
+}
+
+message StatResponse {
+  bytes stats = 1;
+  bytes proof = 2;
+  bytes root = 3;
+}
+
+
 
 message OpenRequest {
   string name = 1;

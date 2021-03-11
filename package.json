@@ -12,6 +12,6 @@
   "dependencies": {
     "@grpc/proto-loader": "^0.5.2",
     "grpc": "^1.24.0",
-    "proxima-db": "^0.6.32"
+    "proxima-db": "^0.6.33s"
   }
 }
