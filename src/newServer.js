@@ -182,8 +182,10 @@ class ProximaDBServer {
         let first = request.first;
         let last = request.last;
         let limit = request.limit;
+        let direction = limit < 0;
         let prove = this.prove || false;
-        let responses = await table.scan(first, last, limit, prove);
+        //range(start, finish, direction, offset = 0, limit = 100, prove = false)
+        let responses = await table.range(first, last, direction, limit, prove);
         let replies = new Array();
         for (var response of responses) {
           //console.log(response.root.toString())
@@ -238,10 +240,10 @@ class ProximaDBServer {
         for (var response of responses) {
           //  console.log("response value: ", response.value.toString())
           //åconsole.log(response.root)
-          let proof = parseProof(response.parseProof) || "";
+          //let proof = parseProof(response.parseProof) || "";
           let proof = parseProof(response.proof) || "";
           let root = response.root || "";
-          let root = replies.push({
+          let replies = replies.push({
             value: response.value,
             proof: proof, //parseProof(response.proof),
             root: root //response.root,
