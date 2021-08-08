@@ -3,7 +3,12 @@ const { Database, Table } = require("proxima-db");
 const protoLoader = require("@grpc/proto-loader");
 const packageDefinition = protoLoader.loadSync("./src/proto/proxima.proto");
 const proximaProto = grpc.loadPackageDefinition(packageDefinition);
-const { parseProof } = require("./helpers.js");
+const {
+  parseProof,
+  parseKey,
+  parseValue,
+  parseRoot
+} = require("../helpers.js");
 
 class ProximaDBServer {
   constructor(args) {
@@ -11,7 +16,6 @@ class ProximaDBServer {
     this.db = this.initDB();
     this.initServer(args);
   }
-
   start() {
     this.server.start();
   }
@@ -21,8 +25,8 @@ class ProximaDBServer {
   }
 
   initServer(args = {}) {
-    ip = args["ip"] || "0.0.0.0";
-    port = args["port"] || "50051";
+    let ip = args["ip"] || "0.0.0.0";
+    let port = args["port"] || "50051";
     this.server.bind(ip + ":" + port, grpc.ServerCredentials.createInsecure());
     this._initServices();
   }
@@ -31,9 +35,6 @@ class ProximaDBServer {
     this.server.addService(proximaProto.ProximaService.service, {
       create: (call, callback) => {
         let request = call.request;
-        //console.log(request.name);
-        //console.log(string(request.key.toString()));
-        //  console.log(request.value.toString());
         this.db
           .create(request.name)
           .then(function(response) {
@@ -86,30 +87,28 @@ class ProximaDBServer {
       },
       put: async (call, callback) => {
         let request = call.request;
-        console.log(request.name);
-        console.log(request.key.toString());
-        console.log(request.value.toString());
-        //console.log(this.db.tables);
+        console.log(request);
+        // console.log(request.name);
+        // console.log(request.key);
+        //console.log("String request: ", request.value.toString());
+        // console.log(this.db.tables);
         let name = request.name;
         let table = await this.db.get(name);
-        ////console.log(request.name)
-        //console.log("table")
-        //console.log(table)
-        //console.log("Request: ", request.value.toString())
-        let response = await table.put(
-          request.key,
-          request.value,
-          request.prove
-        );
+        let key = parseKey(request.key.toString());
+        console.log(key)
+        let value = parseValue(request.value.toString());
+        let prove = request.prove || false;
+        // console.log(request.name);
+        // console.log("table");
+        // console.log(table);
+        //console.log("Request: ", value);
+        let response = await table.put(key, request.value, prove);
         //console.log("Proof response: ", response)
-        //console.log(response.root.length)
-        // console.log(response)
         let reply = {
-          root: response.root,
+          root: parseRoot(response.root),
           proof: parseProof(response.proof)
-          //parseProof(response.root)
         };
-        //console.log("reply: ", reply)
+        //console.log("reply: ", reply);
         callback(null, reply);
       },
       tableRemove: async (call, callback) => {
@@ -122,17 +121,21 @@ class ProximaDBServer {
       },
       get: async (call, callback) => {
         let request = call.request;
-        //console.log(request.name);
-        //console.log(request.key.toString());
+        console.log(request);
+        
+        let name = request.name;
+        let key = parseKey(request.key.toString());
         //console.log(request.value.toString());
-        let prove = true;
-        let table = await this.db.get(request.name);
-        let response = await table.get(request.key, prove);
-        console.log("Proof response: ", response.proof);
+        console.log(key);
+        let prove = request.prove || false;
+        let table = await this.db.get(name);
+        let response = await table.get(key, prove);
+        //console.log("Proof response: ", response.proof);
         console.log(response);
+        //console.log(response.value.toString())
         let reply = {
           value: response.value,
-          root: parseProof(response.root),
+          root: parseRoot(response.root),
           proof: parseProof(response.proof)
           //parseProof(response.root),
         };
@@ -140,12 +143,19 @@ class ProximaDBServer {
       },
       remove: async (call, callback) => {
         let request = call.request;
+        let name = request.name;
+        let key = parseKey(request.key);
+        let prove = request.prove || false;
         let table = await this.db.get(request.name);
+        await table.transaction();
+        await table.remove(key);
+        await table.commit();
+
         table
-          .remove(request.key, request.prove)
+          .get(key, prove)
           .then(function(response) {
             let reply = {
-              root: response.root,
+              root: parseRoot(response.root),
               proof: parseProof(response.proof)
             };
             callback(null, reply);
@@ -167,7 +177,7 @@ class ProximaDBServer {
         for (var response in responses) {
           replies.push({
             proof: parseProof(response.proof),
-            root: response.root
+            root: parseRoot(response.root)
           });
         }
         callback(null, replies);
@@ -193,19 +203,22 @@ class ProximaDBServer {
         let first = request.first;
         let last = request.last;
         let limit = request.limit;
+        limit = 2;
         let direction = limit < 0;
+        first = 0;
+        last = 2;
         let prove = this.prove || false;
+        //console.log(request);
         //range(start, finish, direction, offset = 0, limit = 100, prove = false)
         let responses = await table.range(first, last, direction, limit, prove);
+
         let replies = new Array();
         for (var response of responses) {
           //console.log(response.root.toString())
-          let proof = parseProof(response.proof) || "";
-          let root = response.root || "";
           replies.push({
-            value: response.value,
-            proof: proof,
-            root: root
+            value: parseValue(response.value),
+            proof: parseProot(response.proof),
+            root: parseRoot(response.root)
           });
         }
         let queryReply = {
@@ -228,14 +241,13 @@ class ProximaDBServer {
         let reply = {
           stats: response.stats,
           proof: parseProof(response.proof),
-          root: response.root
+          root: parseRoot(response.root)
         };
         callback(null, reply);
       },
       query: async (call, callback) => {
         let request = call.request;
         let table = await this.db.get(request.name);
-        //console.log(request.query)
         let query = request.query; //"[{\"expression\": \"<\",\"name\":\"numUsers\",\"value\":100}]"
         let queryJSON = JSON.parse(query);
         let prove = request.prove || false;
@@ -245,25 +257,18 @@ class ProximaDBServer {
           limit,
           prove
         );
-
-        //console.log(responses)
         let replies = new Array();
         for (var response of responses) {
-          //  console.log("response value: ", response.value.toString())
-          //åconsole.log(response.root)
-          let proof = parseProof(response.proof) || "";
-          //let proof = response.proof) || "";
           let root = response.root || "";
-          let replies = replies.push({
-            value: response.value,
-            proof: proof, //parseProof(response.proof),
-            root: root //response.root,
+          replies.push({
+            value: parseValue(response.value),
+            proof: parseProof(response.proof),
+            root: parseRoot(response.root)
           });
         }
         let queryReply = {
           responses: replies
         };
-        console.log("Reply: ", queryReply);
         callback(null, queryReply);
       }
     });

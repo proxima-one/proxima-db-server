@@ -11,4 +11,4 @@ VOLUME /app/DB
 
 EXPOSE 50051
 
-CMD ["npm", "start"]
+ENTRYPOINT ["node", "./src/index.js"]
