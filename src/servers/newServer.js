@@ -12,12 +12,16 @@ const {
 
 class ProximaDBServer {
   constructor(args) {
-    this.server = new grpc.Server();
+    this.server = new grpc.Server({'grpc.max_send_message_length': 1024*1024*1024});
     this.db = this.initDB();
     this.initServer(args);
   }
   start() {
+    try {
     this.server.start();
+    } catch(err) {
+      console.log("Error starting gRPC server: ", err.message)
+    }
   }
 
   initDB(args = {}) {
@@ -87,32 +91,21 @@ class ProximaDBServer {
       },
       put: async (call, callback) => {
         let request = call.request;
-        console.log(request);
-        // console.log(request.name);
-        // console.log(request.key);
-        //console.log("String request: ", request.value.toString());
-        // console.log(this.db.tables);
         let name = request.name;
         let table = await this.db.get(name);
         let key = parseKey(request.key.toString());
-        console.log(key)
         let value = parseValue(request.value.toString());
         let prove = request.prove || false;
-        // console.log(request.name);
-        // console.log("table");
-        // console.log(table);
-        //console.log("Request: ", value);
         let response = await table.put(key, request.value, prove);
-        //console.log("Proof response: ", response)
         let reply = {
           root: parseRoot(response.root),
           proof: parseProof(response.proof)
         };
-        //console.log("reply: ", reply);
         callback(null, reply);
       },
       tableRemove: async (call, callback) => {
         let request = call.request;
+        console.log(request)
         let response = await this.db.remove(request.name);
         let reply = {
           confirmation: true
@@ -121,23 +114,16 @@ class ProximaDBServer {
       },
       get: async (call, callback) => {
         let request = call.request;
-        console.log(request);
         
         let name = request.name;
         let key = parseKey(request.key.toString());
-        //console.log(request.value.toString());
-        console.log(key);
         let prove = request.prove || false;
         let table = await this.db.get(name);
         let response = await table.get(key, prove);
-        //console.log("Proof response: ", response.proof);
-        console.log(response);
-        //console.log(response.value.toString())
         let reply = {
           value: response.value,
           root: parseRoot(response.root),
           proof: parseProof(response.proof)
-          //parseProof(response.root),
         };
         callback(null, reply);
       },
@@ -208,13 +194,10 @@ class ProximaDBServer {
         first = 0;
         last = 2;
         let prove = this.prove || false;
-        //console.log(request);
-        //range(start, finish, direction, offset = 0, limit = 100, prove = false)
         let responses = await table.range(first, last, direction, limit, prove);
 
         let replies = new Array();
         for (var response of responses) {
-          //console.log(response.root.toString())
           replies.push({
             value: parseValue(response.value),
             proof: parseProot(response.proof),
@@ -224,7 +207,6 @@ class ProximaDBServer {
         let queryReply = {
           responses: replies
         };
-        console.log(queryReply);
         callback(null, queryReply);
       },
       compact: async (call, callback) => {

@@ -1,4 +1,5 @@
 const { ProximaDBServer } = require("./servers/newServer.js");
+const {start, ProximaDBHttpServer} = require("./http")
 const Config = require("./config");
 const assert = require("assert");
 
@@ -34,11 +35,21 @@ function registerDatabaseStartCommand(cmd) {
       var config = Config.fromYamlFile(options.configPath);
       config.ip = options.ip;
       config.port = options.port;
-      const grpcServer = new ProximaDBServer(config);
-      grpcServer.start();
+      try {
+        const grpcServer = new ProximaDBServer(config);
+        grpcServer.start();
+      } catch (err) {
+        console.error(`Error creating the gRPC server`, err.message);
+      }
+
+      try {
+        const httpServer = new ProximaDBHttpServer(config)
+        httpServer.start();
+      } catch (err) {
+        console.error(`Error creating the http server`, err.message);
+      }
       //const proximaServerEndpoint = new ProximaServerEndpoint(config);
       //proximaServerEndpoint.start();
-      //process.exit(0);
     });
 }
 
