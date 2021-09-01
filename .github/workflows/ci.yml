@@ -1,0 +1,14 @@
+name: build & test
+on: push
+jobs:
+  quick-check:
+    runs-on: ubuntu-latest
+    container: node:14-alpine
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Install
+        run: yarn install
+        
+      - name: Test
+        run: yarn test

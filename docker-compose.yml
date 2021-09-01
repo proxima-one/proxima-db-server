@@ -1,0 +1,14 @@
+version: "3.7"
+services:
+    proxima-db:
+        build:
+            context: .
+            dockerfile: ./docker/proxima-db/Dockerfile
+        command: start
+        image: proximaone/proxima-db:${VERSION:-dev}
+        volumes:
+            - "./DB:/app/DB"
+            - "./config.yaml:/app/config.yaml"
+        ports:
+            - "50051:50051"
+            - "80:80"

@@ -5,6 +5,10 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const router = express.Router();
 
+const swaggerUi = require('swagger-ui-express')
+const swaggerFile = require('../docs-ui/swagger_output.json')
+
+
 
 class ProximaDBHttpServer {
     constructor(args) {
@@ -38,9 +42,14 @@ class ProximaDBHttpServer {
           extended: true,
         })
       );
+
       this.initRoutes()
-      
+      this.swaggerDocs()
     }
+
+swaggerDocs() {
+    this.server.use('/doc', swaggerUi.serve, swaggerUi.setup(swaggerFile))
+}
 
 initRoutes() {
 /*
