@@ -35,67 +35,37 @@
         "responses": {}
       }
     },
-    "/collections/create/{id}": {
+    "/health": {
       "get": {
         "tags": [],
         "description": "",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
+        "parameters": [],
         "responses": {}
       }
     },
-    "/collections/stats/{id}": {
+    "/collections": {
       "get": {
         "tags": [],
         "description": "",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
+        "parameters": [],
+        "responses": {}
+      },
+      "post": {
+        "tags": [],
+        "description": "",
+        "parameters": [],
         "responses": {}
       }
     },
-    "/collections/delete/{id}": {
+    "collections/stats": {
       "get": {
         "tags": [],
         "description": "",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
+        "parameters": [],
         "responses": {}
       }
     },
-    "/collection/{id}/get": {
-      "get": {
-        "tags": [],
-        "description": "",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {}
-      }
-    },
-    "/collection/{id}/remove": {
+    "/collections/{id}": {
       "put": {
         "tags": [],
         "description": "",
@@ -108,10 +78,8 @@
           }
         ],
         "responses": {}
-      }
-    },
-    "/collection/{id}/insert": {
-      "put": {
+      },
+      "delete": {
         "tags": [],
         "description": "",
         "parameters": [
@@ -125,22 +93,7 @@
         "responses": {}
       }
     },
-    "/collection/{id}/update": {
-      "put": {
-        "tags": [],
-        "description": "",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {}
-      }
-    },
-    "/collection/{id}/query": {
+    "/collections/{id}/stats": {
       "get": {
         "tags": [],
         "description": "",
@@ -152,9 +105,573 @@
             "type": "string"
           }
         ],
+        "responses": {}
+      }
+    },
+    "/collections/{id}/documents/{docId}": {
+      "get": {
+        "tags": [],
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "docId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {}
+      },
+      "delete": {
+        "tags": [],
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "docId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {}
+      },
+      "put": {
+        "tags": [],
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "docId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/collections/{id}/documents": {
+      "post": {
+        "tags": [],
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/collections/{id}/query": {
+      "post": {
+        "tags": [],
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/collections/{id}/streams/{streamId}": {
+      "put": {
+        "tags": [],
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "streamId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {}
+      },
+      "get": {
+        "tags": [],
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "streamId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {}
+      },
+      "post": {
+        "tags": [],
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "streamId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/collections/{id}/streams/{streamId}/commits/{commitId}": {
+      "get": {
+        "tags": [],
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "streamId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "commitId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/collections/{id}/streams/{streamId}/commits": {
+      "post": {
+        "tags": [],
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "streamId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/controllers/{controllerId}": {
+      "post": {
+        "tags": [],
+        "description": "",
+        "parameters": [
+          {
+            "name": "controllerId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {}
+      },
+      "get": {
+        "tags": [],
+        "description": "",
+        "parameters": [
+          {
+            "name": "controllerId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {}
+      },
+      "delete": {
+        "tags": [],
+        "description": "",
+        "parameters": [
+          {
+            "name": "controllerId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {}
+      },
+      "put": {
+        "tags": [],
+        "description": "",
+        "parameters": [
+          {
+            "name": "controllerId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/controllers": {
+      "get": {
+        "tags": [],
+        "description": "",
+        "parameters": [],
         "responses": {}
       }
     }
   },
-  "definitions": {}
+  "definitions": {
+    "Collection": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "example": "Collection-1-id"
+        },
+        "state": {
+          "type": "object",
+          "properties": {
+            "version": {
+              "type": "string",
+              "example": "0.0.0"
+            },
+            "name": {
+              "type": "string",
+              "example": "Test Collection"
+            },
+            "controllers": {
+              "type": "array",
+              "example": [
+                "Public Key"
+              ],
+              "items": {
+                "type": "string"
+              }
+            },
+            "latest_commit": {
+              "type": "string",
+              "example": "Commit id"
+            },
+            "schema": {
+              "type": "array",
+              "example": [],
+              "items": {}
+            },
+            "offset": {
+              "type": "number",
+              "example": 0
+            }
+          }
+        }
+      }
+    },
+    "AddCollection": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "example": "Collection-1-id"
+        },
+        "meta": {
+          "type": "object",
+          "properties": {
+            "schema": {
+              "type": "string",
+              "example": "schema-id"
+            },
+            "controllers": {
+              "type": "array",
+              "example": [
+                "Public Key"
+              ],
+              "items": {
+                "type": "string"
+              }
+            },
+            "version": {
+              "type": "string",
+              "example": "0.0.0"
+            }
+          }
+        }
+      }
+    },
+    "Document": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "example": "Document 1 id"
+        },
+        "value": {
+          "type": "string",
+          "example": "Document Value"
+        }
+      }
+    },
+    "AddDocument": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "example": "Document 1 id"
+        },
+        "value": {
+          "type": "string",
+          "example": "Value"
+        }
+      }
+    },
+    "Stream": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "example": "Stream-ud"
+        },
+        "state": {
+          "type": "object",
+          "properties": {
+            "version": {
+              "type": "string",
+              "example": "0.0.0"
+            },
+            "controllers": {
+              "type": "array",
+              "example": [
+                "Public Key"
+              ],
+              "items": {
+                "type": "string"
+              }
+            },
+            "latest_commit": {
+              "type": "string",
+              "example": "Commit id"
+            },
+            "schema": {
+              "type": "string",
+              "example": "schema-id"
+            },
+            "offset": {
+              "type": "number",
+              "example": 0
+            }
+          }
+        }
+      }
+    },
+    "Commit": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "example": "Commit-id"
+        },
+        "state": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "example": "Genesis"
+            },
+            "version": {
+              "type": "string",
+              "example": "0.0.0"
+            },
+            "stream_id": {
+              "type": "string",
+              "example": "stream-id"
+            },
+            "commit_link": {
+              "type": "array",
+              "example": [],
+              "items": {}
+            },
+            "data": {
+              "type": "array",
+              "example": [],
+              "items": {}
+            },
+            "commit_prev": {
+              "type": "array",
+              "example": [],
+              "items": {}
+            },
+            "signature": {
+              "type": "object",
+              "properties": {}
+            }
+          }
+        }
+      }
+    },
+    "AddCommit": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "example": "Commit-id"
+        },
+        "state": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "example": "Genesis"
+            },
+            "version": {
+              "type": "string",
+              "example": "0.0.0"
+            },
+            "stream_id": {
+              "type": "string",
+              "example": "stream-id"
+            },
+            "schema": {
+              "type": "string",
+              "example": "schema-id"
+            },
+            "commit_link": {
+              "type": "array",
+              "example": [],
+              "items": {}
+            },
+            "data": {
+              "type": "array",
+              "example": [],
+              "items": {}
+            },
+            "commit_prev": {
+              "type": "array",
+              "example": [],
+              "items": {}
+            },
+            "signature": {
+              "type": "object",
+              "properties": {}
+            }
+          }
+        }
+      }
+    },
+    "Schema": {
+      "type": "object",
+      "properties": {
+        "schema": {
+          "type": "string",
+          "example": "https://json-schema.org/draft/2020-12/schema"
+        },
+        "title": {
+          "type": "string",
+          "example": "Schema"
+        },
+        "description": {
+          "type": "string",
+          "example": "A schema object"
+        },
+        "type": {
+          "type": "string",
+          "example": "object"
+        },
+        "properties": {
+          "type": "object",
+          "properties": {}
+        },
+        "required": {
+          "type": "array",
+          "example": [],
+          "items": {}
+        },
+        "tags": {
+          "type": "array",
+          "example": [],
+          "items": {}
+        }
+      },
+      "required": [
+        "schema"
+      ]
+    },
+    "DID": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "example": "did:example:123456789abcdefghi"
+        },
+        "authentication": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "did:example:123456789abcdefghi#keys-1"
+              },
+              "type": {
+                "type": "string",
+                "example": "Ed25519VerificationKey2020"
+              },
+              "controller": {
+                "type": "string",
+                "example": "did:example:123456789abcdefghi"
+              },
+              "publicKeyMultibase": {
+                "type": "string",
+                "example": "zH3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 }

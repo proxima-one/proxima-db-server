@@ -55,11 +55,36 @@ initRoutes() {
 /*
 Routes 
 */
+
+
+/*
+Node
+*/
+
 this.server.get('/', (req, res) => {
+
+    res.json({'message': 'ok'});
+})
+
+this.server.get('/stats', (req, res) => {
+
+    res.json({'message': 'ok'});
+})
+
+this.server.get('/health', (req, res) => {
+
+    res.json({'message': 'ok'});
+});
+
+/*
+Collections
+*/
+
+this.server.get('/collections', (req, res) => {
   res.json({'message': 'ok'});
 })
 
-this.server.get('/stats', async (req, res) => {
+this.server.get('collections/stats', async (req, res) => {
     try {
     res.json({"tables": this.db.tables})
     } catch(err) {
@@ -67,7 +92,15 @@ this.server.get('/stats', async (req, res) => {
     }
 });
 
-this.server.get('/collections/create/:id', async (req, res) => {
+this.server.put('/collections/:id', async (req, res) => {
+    try {
+    res.json({"tables": this.db.tables})
+    } catch(err) {
+        console.log("Error with getting the database stats: ", err.message)
+    }
+});
+
+this.server.post('/collections', async (req, res) => {
     try {
         await this.db.create(req.params.id)
         res.json({"created": true, "table" :  req.params.id})
@@ -76,7 +109,7 @@ this.server.get('/collections/create/:id', async (req, res) => {
     }
 } )
 
-this.server.get('/collections/stats/:id', async (req, res) => {
+this.server.get('/collections/:id/stats', async (req, res) => {
     try {
         let table = await this.db.get(req.params.id);
         let stats =await table.stat()
@@ -86,7 +119,7 @@ this.server.get('/collections/stats/:id', async (req, res) => {
     }
 })
 
-this.server.get('/collections/delete/:id', async (req, res) => {
+this.server.delete('/collections/:id', async (req, res) => {
     try {
         await this.db.remove(req.params.id)
         res.json({"removed": true, "table name" :  req.params.id})
@@ -96,7 +129,7 @@ this.server.get('/collections/delete/:id', async (req, res) => {
 })
 
 //collection document 
-this.server.get('/collection/:id/get', async (req, res) => {
+this.server.get('/collections/:id/documents/:docId', async (req, res) => {
     try {
         const table = await this.db.get(req.params.id)
         let key = parseKey(req.params.key.toString());
@@ -113,7 +146,7 @@ this.server.get('/collection/:id/get', async (req, res) => {
     }
 })
 
-    this.server.put('/collection/:id/remove', async (req, res) => {
+    this.server.delete('/collections/:id/documents/:docId', async (req, res) => {
         try {
             const table = await this.db.get(req.params.id)
             let key = parseKey(req.params.key.toString());
@@ -133,7 +166,7 @@ this.server.get('/collection/:id/get', async (req, res) => {
     })
 
     //insert 
-    this.server.put('/collection/:id/insert', async (req, res) => {
+    this.server.post('/collections/:id/documents', async (req, res) => {
         try {
             const table = await this.db.get(req.params.id)
             let key = parseKey(req.params.key.toString());
@@ -153,7 +186,7 @@ this.server.get('/collection/:id/get', async (req, res) => {
     })
 
     //update 
-    this.server.put('/collection/:id/update', async (req, res) => {
+    this.server.put('/collections/:id/documents/:docId', async (req, res) => {
         try {
             const table = await this.db.get(req.params.id)
             let key = parseKey(req.params.key.toString());
@@ -176,7 +209,7 @@ this.server.get('/collection/:id/get', async (req, res) => {
 
 
     //query
-    this.server.get('/collection/:id/query', async (req, res) => {
+    this.server.post('/collections/:id/query', async (req, res) => {
         try {
             const table = await this.db.get(req.params.id)
             let key = parseKey(req.params.key.toString());
@@ -206,6 +239,233 @@ this.server.get('/collection/:id/get', async (req, res) => {
             console.log("Error with document query: ", err.message)
         }
     })
+
+
+    this.server.put('/collections/:id/streams/:streamId', async (req, res) => {
+        try {
+            const table = await this.db.get(req.params.id)
+            let key = parseKey(req.params.key.toString());
+
+            let prove = req.params.prove || false;
+            let value = parseValue(req.params.value.toString());
+            let response = await table.put(key, req.params.value, prove);
+            let reply = {
+                value: req.params.value,
+                confirmation: true,
+                root: parseRoot(response.root),
+                proof: parseProof(response.proof)
+            };
+            res.json(reply)
+        } catch(err) {
+            console.log("Error deleting document: ", err.message)
+        }
+    });
+
+    this.server.get('/collections/:id/streams/:streamId', async (req, res) => {
+        try {
+            const table = await this.db.get(req.params.id)
+            let key = parseKey(req.params.key.toString());
+
+            let prove = req.params.prove || false;
+            let value = parseValue(req.params.value.toString());
+            let response = await table.put(key, req.params.value, prove);
+            let reply = {
+                value: req.params.value,
+                confirmation: true,
+                root: parseRoot(response.root),
+                proof: parseProof(response.proof)
+            };
+            res.json(reply)
+        } catch(err) {
+            console.log("Error deleting document: ", err.message)
+        }
+    });
+
+    this.server.post('/collections/:id/streams/:streamId', async (req, res) => {
+        try {
+            const table = await this.db.get(req.params.id)
+            let key = parseKey(req.params.key.toString());
+
+            let prove = req.params.prove || false;
+            let value = parseValue(req.params.value.toString());
+            let response = await table.put(key, req.params.value, prove);
+            let reply = {
+                value: req.params.value,
+                confirmation: true,
+                root: parseRoot(response.root),
+                proof: parseProof(response.proof)
+            };
+            res.json(reply)
+        } catch(err) {
+            console.log("Error deleting document: ", err.message)
+        }
+    });
+
+
+    this.server.put('/collections/:id/streams/:streamId', async (req, res) => {
+        try {
+            const table = await this.db.get(req.params.id)
+            let key = parseKey(req.params.key.toString());
+
+            let prove = req.params.prove || false;
+            let value = parseValue(req.params.value.toString());
+            let response = await table.put(key, req.params.value, prove);
+            let reply = {
+                value: req.params.value,
+                confirmation: true,
+                root: parseRoot(response.root),
+                proof: parseProof(response.proof)
+            };
+            res.json(reply)
+        } catch(err) {
+            console.log("Error deleting document: ", err.message)
+        }
+    });
+
+    this.server.get('/collections/:id/streams/:streamId/commits/:commitId', async (req, res) => {
+        try {
+            const table = await this.db.get(req.params.id)
+            let key = parseKey(req.params.key.toString());
+
+            let prove = req.params.prove || false;
+            let value = parseValue(req.params.value.toString());
+            let response = await table.put(key, req.params.value, prove);
+            let reply = {
+                value: req.params.value,
+                confirmation: true,
+                root: parseRoot(response.root),
+                proof: parseProof(response.proof)
+            };
+            res.json(reply)
+        } catch(err) {
+            console.log("Error deleting document: ", err.message)
+        }
+    });
+
+    this.server.post('/collections/:id/streams/:streamId/commits', async (req, res) => {
+        try {
+            const table = await this.db.get(req.params.id)
+            let key = parseKey(req.params.key.toString());
+
+            let prove = req.params.prove || false;
+            let value = parseValue(req.params.value.toString());
+            let response = await table.put(key, req.params.value, prove);
+            let reply = {
+                value: req.params.value,
+                confirmation: true,
+                root: parseRoot(response.root),
+                proof: parseProof(response.proof)
+            };
+            res.json(reply)
+        } catch(err) {
+            console.log("Error deleting document: ", err.message)
+        }
+    });
+
+    //controllers
+
+    this.server.post('/controllers/:controllerId', async (req, res) => {
+        try {
+            const table = await this.db.get(req.params.id)
+            let key = parseKey(req.params.key.toString());
+
+            let prove = req.params.prove || false;
+            let value = parseValue(req.params.value.toString());
+            let response = await table.put(key, req.params.value, prove);
+            let reply = {
+                value: req.params.value,
+                confirmation: true,
+                root: parseRoot(response.root),
+                proof: parseProof(response.proof)
+            };
+            res.json(reply)
+        } catch(err) {
+            console.log("Error deleting document: ", err.message)
+        }
+    });
+
+
+    this.server.get('/controllers/:controllerId', async (req, res) => {
+        try {
+            const table = await this.db.get(req.params.id)
+            let key = parseKey(req.params.key.toString());
+
+            let prove = req.params.prove || false;
+            let value = parseValue(req.params.value.toString());
+            let response = await table.put(key, req.params.value, prove);
+            let reply = {
+                value: req.params.value,
+                confirmation: true,
+                root: parseRoot(response.root),
+                proof: parseProof(response.proof)
+            };
+            res.json(reply)
+        } catch(err) {
+            console.log("Error deleting document: ", err.message)
+        }
+    });
+
+    this.server.delete('/controllers/:controllerId', async (req, res) => {
+        try {
+            const table = await this.db.get(req.params.id)
+            let key = parseKey(req.params.key.toString());
+
+            let prove = req.params.prove || false;
+            let value = parseValue(req.params.value.toString());
+            let response = await table.put(key, req.params.value, prove);
+            let reply = {
+                value: req.params.value,
+                confirmation: true,
+                root: parseRoot(response.root),
+                proof: parseProof(response.proof)
+            };
+            res.json(reply)
+        } catch(err) {
+            console.log("Error deleting document: ", err.message)
+        }
+    });
+
+    this.server.put('/controllers/:controllerId', async (req, res) => {
+        try {
+            const table = await this.db.get(req.params.id)
+            let key = parseKey(req.params.key.toString());
+
+            let prove = req.params.prove || false;
+            let value = parseValue(req.params.value.toString());
+            let response = await table.put(key, req.params.value, prove);
+            let reply = {
+                value: req.params.value,
+                confirmation: true,
+                root: parseRoot(response.root),
+                proof: parseProof(response.proof)
+            };
+            res.json(reply)
+        } catch(err) {
+            console.log("Error deleting document: ", err.message)
+        }
+    });
+
+    this.server.get('/controllers', async (req, res) => {
+        try {
+            const table = await this.db.get(req.params.id)
+            let key = parseKey(req.params.key.toString());
+
+            let prove = req.params.prove || false;
+            let value = parseValue(req.params.value.toString());
+            let response = await table.put(key, req.params.value, prove);
+            let reply = {
+                value: req.params.value,
+                confirmation: true,
+                root: parseRoot(response.root),
+                proof: parseProof(response.proof)
+            };
+            res.json(reply)
+        } catch(err) {
+            console.log("Error deleting document: ", err.message)
+        }
+    });
+
+
 
 
 
