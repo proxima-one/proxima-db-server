@@ -3,6 +3,7 @@ const { Database, Table } = require("proxima-db");
 const express = require('express');
 
 const bodyParser = require('body-parser');
+const {parseKey, parseValue, parseProof, parseRoot} = require("../helpers")
 const router = express.Router();
 
 const swaggerUi = require('swagger-ui-express')
@@ -169,19 +170,20 @@ this.server.get('/collections/:id/documents/:docId', async (req, res) => {
     this.server.post('/collections/:id/documents', async (req, res) => {
         try {
             const table = await this.db.get(req.params.id)
-            let key = parseKey(req.params.key.toString());
-            let prove = req.params.prove || false;
-            let value = parseValue(req.params.value.toString());
-            let response = await table.put(key, req.params.value, prove);
+            let reqBody = req.body //JSON.parse(req.body)
+            let key = parseKey(reqBody.key.toString());
+            let prove = reqBody.prove || false;
+            let value = parseValue(reqBody.value.toString());
+            let response = await table.put(key, value, prove);
             let reply = {
-                value: req.params.value,
+                value: value,
                 confirmation: true,
                 root: parseRoot(response.root),
                 proof: parseProof(response.proof)
             };
             res.json(reply)
         } catch(err) {
-            console.log("Error deleting document: ", err.message)
+            console.log("Error inserting document: ", err.message)
         }
     })
 

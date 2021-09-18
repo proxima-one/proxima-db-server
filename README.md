@@ -10,6 +10,24 @@ protoc --go_out=. --go_opt=paths=source_relative \
 -->
 
 
+## Set-up
+
+```
+yarn install 
+```
+
+
+### Run 
+```
+yarn run start
+```
+
+### Load Testing 
+```
+yarn run load-test
+```
+
+
 
 
 ## Installation
