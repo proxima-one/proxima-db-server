@@ -1,0 +1,7 @@
+apiVersion: v1 
+kind: ConfigMap 
+metadata: 
+  name: mongo-express-config
+  namespace: my-namespace
+data: 
+  database_url: mongodb-service 

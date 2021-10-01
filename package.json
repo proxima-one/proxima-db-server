@@ -8,12 +8,13 @@
     "swagger-autogen": "node ./src/docs-ui/swagger.js",
     "run": "docker run -d --name=proxima -v proxima-vol:/app/DB proxima-db-1:latest",
     "test": "node ./src/index.js start & mocha ./test/grpcServerTest.e2e.js",
-    "load-test": "node ./src/index.js start & k6 run --vus 10 --duration 1m ./test/load.js"
+    "load-test": "k6 run --vus 1 --duration 120m ./test/load.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@grpc/proto-loader": "^0.5.2",
+    "ajv": "^8.6.3",
     "assert": "^2.0.0",
     "bsert": "^0.0.10",
     "buffer": "^6.0.3",

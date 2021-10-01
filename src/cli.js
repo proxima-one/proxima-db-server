@@ -51,6 +51,8 @@ function registerDatabaseStartCommand(cmd) {
       } catch (err) {
         console.error(`Error creating the http server`, err.message);
       }
+
+      
       //const proximaServerEndpoint = new ProximaServerEndpoint(config);
       //proximaServerEndpoint.start();
     });

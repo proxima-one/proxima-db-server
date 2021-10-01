@@ -15,6 +15,7 @@ class ProximaDBHttpServer {
     constructor(args) {
       const app = express();
 
+
       const port = 80;
       this.port = 80
       this.server = app
@@ -37,9 +38,10 @@ class ProximaDBHttpServer {
       let port = args["port"] || "50051";
       this.port = port 
       this.ip = ip
-      this.server.use(bodyParser.json());
+      this.server.use(bodyParser.json({limit: '50mb',}));
       this.server.use(
         bodyParser.urlencoded({
+            limit: '50mb',
           extended: true,
         })
       );
@@ -166,24 +168,44 @@ this.server.get('/collections/:id/documents/:docId', async (req, res) => {
         }
     })
 
+
+
     //insert 
     this.server.post('/collections/:id/documents', async (req, res) => {
         try {
             const table = await this.db.get(req.params.id)
-            let reqBody = req.body //JSON.parse(req.body)
-            let key = parseKey(reqBody.key.toString());
-            let prove = reqBody.prove || false;
-            let value = parseValue(reqBody.value.toString());
-            let response = await table.put(key, value, prove);
-            let reply = {
-                value: value,
+            let reqBody = req.body //JSON.parse(req.body)s
+            const entries = reqBody.entries;
+            let replies = new Array();
+            let tx = await table.transaction();
+            for (var entry of entries) {
+                entry.value = parseValue(entry.value.toString());
+                entry.key = parseKey(entry.key.toString())
+                entry.prove = entry.prove || false;
+                let response = await table.put(entry.key, entry.value, entry.prove);
+                console.log(response)
+              replies.push({
+                key: entry.key,
                 confirmation: true,
-                root: parseRoot(response.root),
-                proof: parseProof(response.proof)
-            };
-            res.json(reply)
+                // proof: parseProof(response.data.proof),
+                // root: parseRoot(response.data.root)
+              });
+            }
+            let resp = await table.commit();
+            // let key = ;
+            // let prove = reqBody.prove || false;
+            // let 
+            // let response = await table.put(key, value, prove);
+            // let reply = {
+            //     value: value,
+            //     confirmation: true,
+            //     root: parseRoot(response.root),
+            //     proof: parseProof(response.proof)
+            // };
+            console.log(replies)
+            res.json(replies)
         } catch(err) {
-            console.log("Error inserting document: ", err.message)
+            console.log("Error inserting documents: ", err.message)
         }
     })
 
@@ -320,7 +342,7 @@ this.server.get('/collections/:id/documents/:docId', async (req, res) => {
             };
             res.json(reply)
         } catch(err) {
-            console.log("Error deleting document: ", err.message)
+            console.log("Error updating document: ", err.message)
         }
     });
 
