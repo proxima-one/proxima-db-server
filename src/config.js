@@ -12,36 +12,6 @@ function fromYamlFile(filePath = "./config.yaml") {
   return yaml.load(yamlContent.toString("utf8"));
 }
 
-interface Config {
-  serialize()
-  deserialize()
-  validate()
-}
-
-
-class DatabaseConfig {
-  constructor(name, config = {}) {
-    this.name = name 
-  }
-
-  validate() {
-    return true
-  }
-
-
-}
-
-class CollectionConfig {
-  constructor(databaseName, name, options = {}) {
-    this.databaseName = databaseName
-    this.name = name 
-  }
-
-  validate() {
-    return true
-  }
-}
-
 
 //fromYaml
 //toYAML 

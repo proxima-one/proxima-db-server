@@ -25,6 +25,18 @@
         "description": "",
         "parameters": [],
         "responses": {}
+      },
+      "put": {
+        "tags": [],
+        "description": "",
+        "parameters": [],
+        "responses": {}
+      },
+      "post": {
+        "tags": [],
+        "description": "",
+        "parameters": [],
+        "responses": {}
       }
     },
     "/stats": {
@@ -368,6 +380,28 @@
     }
   },
   "definitions": {
+    "Database": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "example": "Collection-1-id"
+        },
+        "version": {
+          "type": "string",
+          "example": "0.0.0"
+        },
+        "name": {
+          "type": "string",
+          "example": "Test Collection"
+        },
+        "collections": {
+          "type": "array",
+          "example": [],
+          "items": {}
+        }
+      }
+    },
     "Collection": {
       "type": "object",
       "properties": {

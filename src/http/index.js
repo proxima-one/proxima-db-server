@@ -1,5 +1,6 @@
 
-const { Database, Table } = require("proxima-db");
+//const { Database, Table } = require("proxima-db");
+const {Database} = require("../backend/db/database") 
 const express = require('express');
 
 const bodyParser = require('body-parser');
@@ -59,45 +60,47 @@ initRoutes() {
 Routes 
 */
 
-
 /*
 Node
 */
 
 this.server.get('/', (req, res) => {
-
-    res.json({'message': 'ok'});
+    res.json({message: "ok"});
 })
 
-this.server.get('/stats', (req, res) => {
+this.server.post("/", (req, res) => {
+    try {
+        let body = req.body 
+        this.db.updateConfig(body)
+        res.json(this.db.toJSON())
+    } catch (error) {
+        console.log(error)
+    }
 
-    res.json({'message': 'ok'});
 })
 
-this.server.get('/health', (req, res) => {
-
-    res.json({'message': 'ok'});
-});
+this.server.put("/", (req, res) => {
+    try {
+        let body = req.body 
+        this.db = new Database(body.name, body)
+        res.json(this.db.toJSON())
+    } catch (error) {
+        console.log(error)
+    }
+})
 
 /*
 Collections
 */
 
-this.server.get('/collections', (req, res) => {
-  res.json({'message': 'ok'});
-})
-
-this.server.get('collections/stats', async (req, res) => {
-    try {
-    res.json({"tables": this.db.tables})
-    } catch(err) {
-        console.log("Error with getting the database stats: ", err.message)
-    }
+this.server.get('/collections/:id', (req, res) => {
+    res.json({'message': 'ok'});
 });
 
 this.server.put('/collections/:id', async (req, res) => {
     try {
-    res.json({"tables": this.db.tables})
+        let newCollection = await this.db.updateCollection(req.params.id, req.body)
+        res.json({updated: true, collection: newCollection.toJSON()})
     } catch(err) {
         console.log("Error with getting the database stats: ", err.message)
     }
@@ -105,36 +108,36 @@ this.server.put('/collections/:id', async (req, res) => {
 
 this.server.post('/collections', async (req, res) => {
     try {
-        await this.db.create(req.params.id)
+        let collection = await this.db.createCollection(req.params.id, req.body)
         res.json({"created": true, "table" :  req.params.id})
     } catch(err) {
         console.log("Error creating collection: ", err.message)
-    }
-} )
-
-this.server.get('/collections/:id/stats', async (req, res) => {
-    try {
-        let table = await this.db.get(req.params.id);
-        let stats =await table.stat()
-        res.json({"table name" :  req.params.id, "table stats": stats})
-    } catch(err) {
-        console.log("Error getting collection: ", err.message)
     }
 })
 
 this.server.delete('/collections/:id', async (req, res) => {
     try {
-        await this.db.remove(req.params.id)
+        await this.db.deleteCollection(req.params.id)
         res.json({"removed": true, "table name" :  req.params.id})
     } catch(err) {
         console.log("Error deleting collection: ", err.message)
     }
 })
 
+// this.server.get('/collections/:id/stats', async (req, res) => {
+//     try {
+//         let table = await this.db.get(req.params.id);
+//         let stats =await table.stat()
+//         res.json({"table name" :  req.params.id, "table stats": stats})
+//     } catch(err) {
+//         console.log("Error getting collection: ", err.message)
+//     }
+// })
+
 //collection document 
 this.server.get('/collections/:id/documents/:docId', async (req, res) => {
     try {
-        const table = await this.db.get(req.params.id)
+        const table = await this.db.getCollection(req.params.id)
         let key = parseKey(req.params.key.toString());
         let prove = req.params.prove || false;
         let response = await table.get(key, prove);
@@ -151,7 +154,7 @@ this.server.get('/collections/:id/documents/:docId', async (req, res) => {
 
     this.server.delete('/collections/:id/documents/:docId', async (req, res) => {
         try {
-            const table = await this.db.get(req.params.id)
+            const table = await this.db.getCollection(req.params.id)
             let key = parseKey(req.params.key.toString());
             let prove = req.params.prove || false;
             await table.transaction();
@@ -173,7 +176,7 @@ this.server.get('/collections/:id/documents/:docId', async (req, res) => {
     //insert 
     this.server.post('/collections/:id/documents', async (req, res) => {
         try {
-            const table = await this.db.get(req.params.id)
+            const table = await this.db.getCollection(req.params.id)
             let reqBody = req.body //JSON.parse(req.body)s
             const entries = reqBody.entries;
             let replies = new Array();
@@ -212,7 +215,7 @@ this.server.get('/collections/:id/documents/:docId', async (req, res) => {
     //update 
     this.server.put('/collections/:id/documents/:docId', async (req, res) => {
         try {
-            const table = await this.db.get(req.params.id)
+            const table = await this.db.getCollection(req.params.id)
             let key = parseKey(req.params.key.toString());
 
             let prove = req.params.prove || false;
@@ -235,7 +238,7 @@ this.server.get('/collections/:id/documents/:docId', async (req, res) => {
     //query
     this.server.post('/collections/:id/query', async (req, res) => {
         try {
-            const table = await this.db.get(req.params.id)
+            const table = await this.db.getCollection(req.params.id)
             let key = parseKey(req.params.key.toString());
             let query = req.params.query; //"[{\"expression\": \"<\",\"name\":\"numUsers\",\"value\":100}]"
             let queryJSON = JSON.parse(query);
@@ -267,7 +270,7 @@ this.server.get('/collections/:id/documents/:docId', async (req, res) => {
 
     this.server.put('/collections/:id/streams/:streamId', async (req, res) => {
         try {
-            const table = await this.db.get(req.params.id)
+            const table = await this.db.getCollection(req.params.id)
             let key = parseKey(req.params.key.toString());
 
             let prove = req.params.prove || false;
@@ -287,7 +290,7 @@ this.server.get('/collections/:id/documents/:docId', async (req, res) => {
 
     this.server.get('/collections/:id/streams/:streamId', async (req, res) => {
         try {
-            const table = await this.db.get(req.params.id)
+            const table = await this.db.getCollection(req.params.id)
             let key = parseKey(req.params.key.toString());
 
             let prove = req.params.prove || false;
@@ -307,7 +310,7 @@ this.server.get('/collections/:id/documents/:docId', async (req, res) => {
 
     this.server.post('/collections/:id/streams/:streamId', async (req, res) => {
         try {
-            const table = await this.db.get(req.params.id)
+            const table = await this.db.getCollection(req.params.id)
             let key = parseKey(req.params.key.toString());
 
             let prove = req.params.prove || false;
@@ -328,7 +331,7 @@ this.server.get('/collections/:id/documents/:docId', async (req, res) => {
 
     this.server.put('/collections/:id/streams/:streamId', async (req, res) => {
         try {
-            const table = await this.db.get(req.params.id)
+            const table = await this.db.getCollection(req.params.id)
             let key = parseKey(req.params.key.toString());
 
             let prove = req.params.prove || false;
@@ -348,7 +351,7 @@ this.server.get('/collections/:id/documents/:docId', async (req, res) => {
 
     this.server.get('/collections/:id/streams/:streamId/commits/:commitId', async (req, res) => {
         try {
-            const table = await this.db.get(req.params.id)
+            const table = await this.db.getCollection(req.params.id)
             let key = parseKey(req.params.key.toString());
 
             let prove = req.params.prove || false;
@@ -368,7 +371,7 @@ this.server.get('/collections/:id/documents/:docId', async (req, res) => {
 
     this.server.post('/collections/:id/streams/:streamId/commits', async (req, res) => {
         try {
-            const table = await this.db.get(req.params.id)
+            const table = await this.db.getCollection(req.params.id)
             let key = parseKey(req.params.key.toString());
 
             let prove = req.params.prove || false;
@@ -390,7 +393,7 @@ this.server.get('/collections/:id/documents/:docId', async (req, res) => {
 
     this.server.post('/controllers/:controllerId', async (req, res) => {
         try {
-            const table = await this.db.get(req.params.id)
+            const table = await this.db.getCollection(req.params.id)
             let key = parseKey(req.params.key.toString());
 
             let prove = req.params.prove || false;
@@ -411,7 +414,7 @@ this.server.get('/collections/:id/documents/:docId', async (req, res) => {
 
     this.server.get('/controllers/:controllerId', async (req, res) => {
         try {
-            const table = await this.db.get(req.params.id)
+            const table = await this.db.getCollection(req.params.id)
             let key = parseKey(req.params.key.toString());
 
             let prove = req.params.prove || false;
@@ -431,7 +434,7 @@ this.server.get('/collections/:id/documents/:docId', async (req, res) => {
 
     this.server.delete('/controllers/:controllerId', async (req, res) => {
         try {
-            const table = await this.db.get(req.params.id)
+            const table = await this.db.getCollection(req.params.id)
             let key = parseKey(req.params.key.toString());
 
             let prove = req.params.prove || false;
@@ -451,7 +454,7 @@ this.server.get('/collections/:id/documents/:docId', async (req, res) => {
 
     this.server.put('/controllers/:controllerId', async (req, res) => {
         try {
-            const table = await this.db.get(req.params.id)
+            const table = await this.db.getCollection(req.params.id)
             let key = parseKey(req.params.key.toString());
 
             let prove = req.params.prove || false;
@@ -471,7 +474,7 @@ this.server.get('/collections/:id/documents/:docId', async (req, res) => {
 
     this.server.get('/controllers', async (req, res) => {
         try {
-            const table = await this.db.get(req.params.id)
+            const table = await this.db.getCollection(req.params.id)
             let key = parseKey(req.params.key.toString());
 
             let prove = req.params.prove || false;
