@@ -16,4 +16,5 @@ ENV NODE_ENV production
 EXPOSE 50051
 EXPOSE 80
 
-ENTRYPOINT ["node", "./src/index.js"]
+ENTRYPOINT ["yarn", "run"]
+CMD [“start”]

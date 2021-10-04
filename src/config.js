@@ -12,6 +12,12 @@ function fromYamlFile(filePath = "./config.yaml") {
   return yaml.load(yamlContent.toString("utf8"));
 }
 
+
+//fromYaml
+//toYAML 
+//output
+
+
 module.exports = {
   fromYamlFile
 };

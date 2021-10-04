@@ -16,7 +16,12 @@ const doc = {
     consumes: ['application/json'],
     produces: ['application/json'],
     definitions: {
-        Collection: {
+      Database: {
+        id: "Collection-1-id",
+        version: "0.0.0",
+        name: "Test Collection",
+        collections: []
+      }, Collection: {
           id: "Collection-1-id",
           state: {
             version: "0.0.0",

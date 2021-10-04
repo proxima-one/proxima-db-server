@@ -28,8 +28,6 @@ yarn run load-test
 ```
 
 
-
-
 ## Installation
 
 ### Docker
