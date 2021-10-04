@@ -24,12 +24,12 @@ function setup() {
 
 var app;
 
+beforeAll(() => {
+    app = setup()
+});
+
+
 describe("Proxima DB server test, end-to-end documents", () => {
-
-    before(() => {
-        app = setup()
-    });
-
 
     it("should be able to connect to server from localhost", function (done) {
         request(app)

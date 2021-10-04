@@ -7,8 +7,8 @@
     "start": "node ./src/index.js start",
     "swagger-autogen": "node ./src/docs-ui/swagger.js",
     "run": "docker run -d --name=proxima -v proxima-vol:/app/DB proxima-db-1:latest",
-    "test": "mocha ./test/grpcServerTest.e2e.js",
-    "load-test": "k6 run --vus 1 --duration 120m ./test/load.js"
+    "test": "jest",
+    "load-test": "k6 run --vus 1 --duration 120m ./k6/load.js"
   },
   "author": "",
   "license": "ISC",
