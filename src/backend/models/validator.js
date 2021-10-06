@@ -16,6 +16,8 @@ class ModelValidator {
     }
 }
 
+//isSchema
+
 
 const DocumentValidator = new ModelValidator(DocumentModelSchema)
 const MessageValidator = new ModelValidator(MessageModelSchema)

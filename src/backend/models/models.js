@@ -14,6 +14,7 @@ const CollectionModelSchema = {
     }
 }
 
+const DEFAULT_COLLECTION_CONFIG = {}
 
 const DocumentModelSchema = {
     properties: {
@@ -27,4 +28,4 @@ const MessageModelSchema = {
     }
 }
 
-module.exports = {MessageModelSchema, DocumentModelSchema, DatabaseModelSchema, DEFAULT_DB_CONFIG, CollectionModelSchema}
+module.exports = {MessageModelSchema, DocumentModelSchema, DatabaseModelSchema, DEFAULT_DB_CONFIG, DEFAULT_COLLECTION_CONFIG, CollectionModelSchema}
