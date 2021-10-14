@@ -1,65 +1,21 @@
-# Proxima DB Server
+# Welcome!
 
-The Proxima DB Server is intended to be used for interactions with multiple languages through grpc protocol.
+## Welcome to MyAPI
 
-<!--
-protoc --go_out=. --go_opt=paths=source_relative \
-    --go-grpc_out=. --go-grpc_opt=paths=source_relative \
-    helloworld/helloworld.proto
+Welcome to MyAPI! Here you'll find all the documentation you need to get up and running with the MyAPI API.
 
--->
+## Want to jump right in?
 
+Feeling like an eager beaver? Jump in to the quick start docs and get making your first request:
 
-## Set-up
+{% content-ref url="quick-start.md" %}
+[quick-start.md](quick-start.md)
+{% endcontent-ref %}
 
-```
-yarn install 
-```
+## Want to deep dive?
 
+Dive a little deeper and start exploring our API reference to get an idea of everything that's possible with the API:
 
-### Run 
-```
-yarn run start
-```
-
-### Load Testing 
-```
-yarn run load-test
-```
-
-
-## Installation
-
-### Docker
-
-```
-docker pull chasesmith95/proxima-db-server:latest
-```
-
-### NPM
-
-```
-npm install proxima-db-server
-```
-
-## Start
-
-Default server configuration:
-
-IP: `0.0.0.0`
-Port: `50051`
-
-### Docker
-```
-docker run -p 50051:50051 chasesmith95/proxima-db-server:latest
-```
-
-### NPM
-
-```
-npm start
-```
-
-## Usage
-
-- [Go Client]()
+{% content-ref url="reference/api-reference/" %}
+[api-reference](reference/api-reference/)
+{% endcontent-ref %}
