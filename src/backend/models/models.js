@@ -7,10 +7,14 @@ const DatabaseModelSchema = {
 
 const DEFAULT_DB_CONFIG = {}
 
+
+
 const CollectionModelSchema = {
     properties: {
         name: {type: "string"},
-        version: {type: "string"}
+        type: {type: "string"}, 
+        version: {type: "string"},
+        schema: {type: "string"} 
     }
 }
 
@@ -28,4 +32,12 @@ const MessageModelSchema = {
     }
 }
 
-module.exports = {MessageModelSchema, DocumentModelSchema, DatabaseModelSchema, DEFAULT_DB_CONFIG, DEFAULT_COLLECTION_CONFIG, CollectionModelSchema}
+const TransactionModelSchema = {
+    properties: {
+        command: {type: "string"},
+        params: { type: "object"},
+    }
+}
+
+
+module.exports = {TransactionModelSchema, MessageModelSchema, DocumentModelSchema, DatabaseModelSchema, DEFAULT_DB_CONFIG, DEFAULT_COLLECTION_CONFIG, CollectionModelSchema}

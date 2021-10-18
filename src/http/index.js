@@ -99,10 +99,12 @@ this.server.get('/collections/:id', (req, res) => {
 
 this.server.put('/collections/:id', async (req, res) => {
     try {
-        let newCollection = await this.db.updateCollection(req.params.id, req.body)
-        res.json({updated: true, collection: newCollection.toJSON()})
+        let newCollectionResp = await this.db.updateCollectionConfig(req.params.id, req.body)
+        let collection = await this.db.getCollection(req.params.id)
+        res.json({updated: true, collection: collection.toJSON()})
     } catch(err) {
         console.log("Error with getting the database stats: ", err.message)
+        res.json({updated: false, error: err.message})
     }
 });
 
@@ -112,6 +114,7 @@ this.server.post('/collections', async (req, res) => {
         res.json({"created": true, "table" :  req.params.id})
     } catch(err) {
         console.log("Error creating collection: ", err.message)
+        res.json({"error" : err.message})
     }
 })
 
@@ -121,6 +124,7 @@ this.server.delete('/collections/:id', async (req, res) => {
         res.json({"removed": true, "table name" :  req.params.id})
     } catch(err) {
         console.log("Error deleting collection: ", err.message)
+        res.json({updated: false, error: err.message})
     }
 })
 
@@ -491,20 +495,6 @@ this.server.get('/collections/:id/documents/:docId', async (req, res) => {
             console.log("Error deleting document: ", err.message)
         }
     });
-
-
-
-
-
-
-
-//collection/snapshot
-    //meta 
-    //new 
-    //remove 
-    //query
-
-//collection/operations/
 }
 
 }
