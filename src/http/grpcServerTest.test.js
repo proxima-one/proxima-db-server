@@ -1,3 +1,7 @@
+/**
+ * @jest-environment node
+ */
+
 const request = require('supertest');
 const { ProximaDBServer } = require("../servers/newServer.js");
 const {start, ProximaDBHttpServer} = require(".");

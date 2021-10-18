@@ -1,4 +1,6 @@
-
+/**
+ * @jest-environment node
+ */
 
 const {TransactionValidator} = require("./transactions")
 

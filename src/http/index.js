@@ -1,6 +1,6 @@
 
 //const { Database, Table } = require("proxima-db");
-const {Database} = require("../backend/db/database") 
+const {Database} = require("../backend/db/database.js") 
 const express = require('express');
 
 const bodyParser = require('body-parser');
