@@ -118,7 +118,10 @@ module.exports = {
   roots: [
     "./src",
     "./test",
-    "./src/*"
+    "./src/http",
+    "./src/backend/transactions",
+    "./src/backend/models",
+    "./src/backend/db"
   ],
 
   // Allows you to use a custom runner instead of Jest's default test runner
