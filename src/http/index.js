@@ -142,7 +142,7 @@ this.server.delete('/collections/:id', async (req, res) => {
 this.server.get('/collections/:id/documents/:docId', async (req, res) => {
     try {
         const table = await this.db.getCollection(req.params.id)
-        let key = parseKey(req.params.key.toString());
+        let key = parseKey(req.params.docId.toString());
         let prove = req.params.prove || false;
         let response = await table.get(key, prove);
         let reply = {
@@ -220,9 +220,9 @@ this.server.get('/collections/:id/documents/:docId', async (req, res) => {
     this.server.put('/collections/:id/documents/:docId', async (req, res) => {
         try {
             const table = await this.db.getCollection(req.params.id)
-            let key = parseKey(req.params.key.toString());
-
+            let key = parseKey(req.params.docId.toString());
             let prove = req.params.prove || false;
+            console.log(value)
             let value = parseValue(req.params.value.toString());
             let response = await table.put(key, req.params.value, prove);
             let reply = {
@@ -231,6 +231,7 @@ this.server.get('/collections/:id/documents/:docId', async (req, res) => {
                 root: parseRoot(response.root),
                 proof: parseProof(response.proof)
             };
+            console.log(reply)
             res.json(reply)
         } catch(err) {
             console.log("Error deleting document: ", err.message)

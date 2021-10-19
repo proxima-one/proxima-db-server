@@ -139,4 +139,9 @@ describe("Proxima DB server test, end-to-end documents", () => {
         }); 
 
     })
+
+    // describe("Documentation CRUD", () => {
+
+
+    // });
 });
