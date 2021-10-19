@@ -1,6 +1,10 @@
 
+/**
+ * @jest-environment node
+ */
+
 //const { Database, Table } = require("proxima-db");
-const {Database} = require(require.resolve("../backend/db/database.js"))
+const {Database} = require("../backend/db/database.js")
 const express = require('express');
 
 const bodyParser = require('body-parser');
