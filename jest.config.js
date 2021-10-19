@@ -77,6 +77,9 @@ module.exports = {
   //   "tsx",
   //   "node"
   // ],
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/src/$1',
+},
 
   // A map from regular expressions to module names that allow to stub out resources with a single module
   // moduleNameMapper: {},
