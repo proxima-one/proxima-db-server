@@ -68,6 +68,8 @@ module.exports = {
     "node_modules",
     "/src",
     "/test",
+    "/src/http",
+    "/src/backend"
   ],
 
   // An array of file extensions your modules use
