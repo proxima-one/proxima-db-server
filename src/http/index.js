@@ -1,14 +1,20 @@
 
+/**
+ * @jest-environment node
+ */
+
 //const { Database, Table } = require("proxima-db");
-const {Database} = require("../backend/db/database") 
+const {parseKey, parseValue, parseProof, parseRoot} = require("../helpers")
+const swaggerFile = require('../docs-ui/swagger_output.json')
+const {Database} = require("../backend/database/database")
 const express = require('express');
 
 const bodyParser = require('body-parser');
-const {parseKey, parseValue, parseProof, parseRoot} = require("../helpers")
+
 const router = express.Router();
 
 const swaggerUi = require('swagger-ui-express')
-const swaggerFile = require('../docs-ui/swagger_output.json')
+
 
 
 
@@ -31,7 +37,7 @@ class ProximaDBHttpServer {
     }
   
     initDB(args = {}) {
-      return new Database(args["hash"], args["bits"], args["db_path"]);
+      return new Database("Default");
     }
   
     initServer(args = {}) {
@@ -83,7 +89,7 @@ this.server.put("/", (req, res) => {
     try {
         let body = req.body 
         this.db = new Database(body.name, body)
-        res.json(this.db.toJSON())
+        res.json(body.name)
     } catch (error) {
         console.log(error)
     }
@@ -99,10 +105,12 @@ this.server.get('/collections/:id', (req, res) => {
 
 this.server.put('/collections/:id', async (req, res) => {
     try {
-        let newCollection = await this.db.updateCollection(req.params.id, req.body)
-        res.json({updated: true, collection: newCollection.toJSON()})
+        let newCollectionResp = await this.db.updateCollectionConfig(req.params.id, req.body)
+        let collection = await this.db.getCollection(req.params.id)
+        res.json({updated: true, collection: req.body})
     } catch(err) {
         console.log("Error with getting the database stats: ", err.message)
+        res.json({updated: false, error: err.message})
     }
 });
 
@@ -112,6 +120,7 @@ this.server.post('/collections', async (req, res) => {
         res.json({"created": true, "table" :  req.params.id})
     } catch(err) {
         console.log("Error creating collection: ", err.message)
+        res.json({"error" : err.message})
     }
 })
 
@@ -121,6 +130,7 @@ this.server.delete('/collections/:id', async (req, res) => {
         res.json({"removed": true, "table name" :  req.params.id})
     } catch(err) {
         console.log("Error deleting collection: ", err.message)
+        res.json({updated: false, error: err.message})
     }
 })
 
@@ -138,7 +148,7 @@ this.server.delete('/collections/:id', async (req, res) => {
 this.server.get('/collections/:id/documents/:docId', async (req, res) => {
     try {
         const table = await this.db.getCollection(req.params.id)
-        let key = parseKey(req.params.key.toString());
+        let key = parseKey(req.params.docId.toString());
         let prove = req.params.prove || false;
         let response = await table.get(key, prove);
         let reply = {
@@ -155,7 +165,7 @@ this.server.get('/collections/:id/documents/:docId', async (req, res) => {
     this.server.delete('/collections/:id/documents/:docId', async (req, res) => {
         try {
             const table = await this.db.getCollection(req.params.id)
-            let key = parseKey(req.params.key.toString());
+            let key = parseKey(req.params.docId.toString());
             let prove = req.params.prove || false;
             await table.transaction();
             await table.remove(key);
@@ -163,7 +173,6 @@ this.server.get('/collections/:id/documents/:docId', async (req, res) => {
             let reply = {
               key: req.key,
               confirmation: true
-
             };
             res.json(reply)
         } catch(err) {
@@ -177,6 +186,31 @@ this.server.get('/collections/:id/documents/:docId', async (req, res) => {
     this.server.post('/collections/:id/documents', async (req, res) => {
         try {
             const table = await this.db.getCollection(req.params.id)
+            //check if 
+            let reqBody = req.body //JSON.parse(req.body)s
+             let key = parseKey(reqBody.key.toString());
+             let value = parseValue(reqBody.value.toString())
+            let prove = reqBody.prove || false;
+            let response = await table.put(key, value, prove);
+            let reply = {
+                value: value,
+                confirmation: true,
+                root: parseRoot(response.root),
+                proof: parseProof(response.proof)
+            };
+            res.json(reply)
+        } catch(err) {
+            console.log("Error inserting documents: ", err.message)
+        }
+    })
+
+
+
+
+    this.server.post('/collections/:id/documents/bulkInsert', async (req, res) => {
+        try {
+            const table = await this.db.getCollection(req.params.id)
+            //check if 
             let reqBody = req.body //JSON.parse(req.body)s
             const entries = reqBody.entries;
             let replies = new Array();
@@ -216,9 +250,9 @@ this.server.get('/collections/:id/documents/:docId', async (req, res) => {
     this.server.put('/collections/:id/documents/:docId', async (req, res) => {
         try {
             const table = await this.db.getCollection(req.params.id)
-            let key = parseKey(req.params.key.toString());
-
+            let key = parseKey(req.params.docId.toString());
             let prove = req.params.prove || false;
+            console.log(value)
             let value = parseValue(req.params.value.toString());
             let response = await table.put(key, req.params.value, prove);
             let reply = {
@@ -491,20 +525,6 @@ this.server.get('/collections/:id/documents/:docId', async (req, res) => {
             console.log("Error deleting document: ", err.message)
         }
     });
-
-
-
-
-
-
-
-//collection/snapshot
-    //meta 
-    //new 
-    //remove 
-    //query
-
-//collection/operations/
 }
 
 }
