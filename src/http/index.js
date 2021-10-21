@@ -4,15 +4,17 @@
  */
 
 //const { Database, Table } = require("proxima-db");
-const {Database} = require("../backend/db/database.js")
+const {parseKey, parseValue, parseProof, parseRoot} = require("../helpers")
+const swaggerFile = require('../docs-ui/swagger_output.json')
+const {Database} = require("../backend/db/database")
 const express = require('express');
 
 const bodyParser = require('body-parser');
-const {parseKey, parseValue, parseProof, parseRoot} = require("../helpers")
+
 const router = express.Router();
 
 const swaggerUi = require('swagger-ui-express')
-const swaggerFile = require('../docs-ui/swagger_output.json')
+
 
 
 
