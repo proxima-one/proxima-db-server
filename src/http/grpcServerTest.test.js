@@ -128,7 +128,7 @@ describe("Proxima DB server test, end-to-end documents", () => {
             .send(newCollectionConfig)
             .set('Accept', 'application/json')
             .expect(200, done);
-        })
+        });
 
         it("Should be able to delete a collection", function (done) {
             let collectionName = "collection"
@@ -140,8 +140,43 @@ describe("Proxima DB server test, end-to-end documents", () => {
 
     })
 
-    // describe("Documentation CRUD", () => {
 
+    describe("CRUD for Documents", function (done) {
+        it("Should be able to create schema for documents", function (done) {
+            let collectionName = "collection"
+            let newDocumentSchema = {
+                properties: {
+                   key: {type: "string"}, 
+                   val: {type: "string"}
+            }
+        }
 
-    // });
+        let newCollectionConfig = {
+            name: "collection",
+            version: "0.0.1",
+            type: "Document",
+            schema: JSON.stringify(newDocumentSchema)
+        }
+            request(app)
+            .put('/collections/' + collectionName)
+            .send(newCollectionConfig)
+            .set('Accept', 'application/json')
+            .expect(200, done);
+        });
+
+        it("Should be able to insert a new document", function (done) {
+            let collectionName = "collection"
+            let document1 = {
+                key: "Document 1",
+                value: JSON.stringify({"values": "hello"})
+            }
+
+            request(app)
+             .post('/collections/' + collectionName + "/documents")
+             .send(document1)
+             .set('Accept', 'application/json')
+             .expect(200, done)
+        })
+
+    })
 });
