@@ -65,7 +65,9 @@ module.exports = {
 
   // An array of directory names to be searched recursively up from the requiring module's location
   moduleDirectories: [
-    "node_modules"
+    "node_modules",
+    "/src",
+    "/test",
   ],
 
   // An array of file extensions your modules use
@@ -80,12 +82,6 @@ module.exports = {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
 },
-
-modulePaths: [
-  "./src",
-  "./test",
-  "./src/http"
-],
 
   // A map from regular expressions to module names that allow to stub out resources with a single module
   // moduleNameMapper: {},
@@ -124,10 +120,10 @@ modulePaths: [
   // rootDir: null,
 
   // A list of paths to directories that Jest should use to search for files in
-  roots: [
-    "<rootDir>/src/",
-    "<rootDir>/test/"
-  ],
+  // roots: [
+  //   "src/",
+  //   "test/"
+  // ],
 
   // Allows you to use a custom runner instead of Jest's default test runner
   // runner: "jest-runner",
