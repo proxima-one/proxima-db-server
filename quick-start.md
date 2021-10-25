@@ -10,75 +10,29 @@ Your API requests are authenticated using API keys. Any request that doesn't inc
 
 You can generate an API key from your Dashboard at any time.
 
-## Install the library
+## Connect to the Node
 
 The best way to interact with our API is to use one of our official libraries:
 
 {% tabs %}
-{% tab title="Node" %}
+{% tab title="Curl" %}
 ```
 # Install via NPM
 npm install --save my-api
 ```
 {% endtab %}
-
-{% tab title="Python" %}
-```
-# Install via pip
-pip install --upgrade myapi
-```
-{% endtab %}
 {% endtabs %}
-
-{% hint style="info" %}
-**Good to know:** Using tabs to separate out different languages is a great way to present technical examples or code documentation without cramming your docs with extra sections or pages per language.
-{% endhint %}
 
 ## Make your first request
 
 To make your first request, send an authenticated request to the pets endpoint. This will create a `pet`, which is nice.
 
-{% swagger baseUrl="https://api.myapi.com/v1" method="post" path="/pet" summary="Create pet." %}
-{% swagger-description %}
-Creates a new pet.
-{% endswagger-description %}
+{% swagger src="https://raw.githubusercontent.com/proxima-one/proxima-db-server/master/src/docs-ui/swagger_output.json" path="/pet" method="post" %}
+[https://raw.githubusercontent.com/proxima-one/proxima-db-server/master/src/docs-ui/swagger_output.json](https://raw.githubusercontent.com/proxima-one/proxima-db-server/master/src/docs-ui/swagger_output.json)
+{% endswagger %}
 
-{% swagger-parameter in="body" name="name" required="true" type="string" %}
-The name of the pet
-{% endswagger-parameter %}
-
-{% swagger-parameter in="body" name="owner_id" required="false" type="string" %}
-The 
-
-`id`
-
- of the user who owns the pet
-{% endswagger-parameter %}
-
-{% swagger-parameter in="body" name="species" required="false" type="string" %}
-The species of the pet
-{% endswagger-parameter %}
-
-{% swagger-parameter in="body" name="breed" required="false" type="string" %}
-The breed of the pet
-{% endswagger-parameter %}
-
-{% swagger-response status="200" description="Pet successfully created" %}
-```javascript
-{
-    "name"="Wilson",
-    "owner": {
-        "id": "sha7891bikojbkreuy",
-        "name": "Samuel Passet",
-    "species": "Dog",}
-    "breed": "Golden Retriever",
-}
-```
-{% endswagger-response %}
-
-{% swagger-response status="401" description="Permission denied" %}
-
-{% endswagger-response %}
+{% swagger src="https://raw.githubusercontent.com/proxima-one/proxima-db-server/master/src/docs-ui/swagger_output.json" path="undefined" method="undefined" %}
+[https://raw.githubusercontent.com/proxima-one/proxima-db-server/master/src/docs-ui/swagger_output.json](https://raw.githubusercontent.com/proxima-one/proxima-db-server/master/src/docs-ui/swagger_output.json)
 {% endswagger %}
 
 {% hint style="info" %}
