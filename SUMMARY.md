@@ -2,9 +2,11 @@
 
 * [Welcome!](README.md)
 * [Quick Start](quick-start.md)
+* [Tutorials](tutorials/README.md)
+  * [Setting up a DEX Data Layer](tutorials/setting-up-a-dex-data-layer.md)
 
 ## Reference
 
 * [API Reference](reference/api-reference/README.md)
-  * [Pets](reference/api-reference/pets.md)
-  * [Users](reference/api-reference/users.md)
+  * [Collections](reference/api-reference/collections.md)
+  * [Documents](reference/api-reference/documents.md)

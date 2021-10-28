@@ -1,31 +1,62 @@
 # Quick Start
 
 {% hint style="info" %}
-**Good to know:** A quick start guide can be good to help folks get up and running with your API in a few steps. Some people prefer diving in with the basics rather than meticulously reading every page of documentation!
+**Good to know:** This is a quickstart guide to the Proxima DB Node
 {% endhint %}
 
-## Get your API keys
 
-Your API requests are authenticated using API keys. Any request that doesn't include an API key will return an error.
 
-You can generate an API key from your Dashboard at any time.
+## Running a Proxima DB Node
 
-## Connect to the Node
+### Requirements
 
-The best way to interact with our API is to use one of our official libraries:
+Before installing and using the Proxima DB Node it is necessary to ensure several system requirements.&#x20;
+
+* `git  `
+* `node`
+* `yarn `
+
+### Installation
+
+
+
+```
+git clone https://github.com/proxima-one/proxima-db-server
+```
+
+### Testing
+
+```
+yarn test
+```
+
+```
+yarn benchmark
+```
+
+### Starting the node&#x20;
+
+You can run the database node as a node, or as a kubernetes package.&#x20;
 
 {% tabs %}
-{% tab title="Curl" %}
+{% tab title="Node" %}
+
+
 ```
-# Install via NPM
-npm install --save my-api
+yarn start
 ```
+{% endtab %}
+
+{% tab title="Docker" %}
+
+{% endtab %}
+
+{% tab title="Kubernetes" %}
+
 {% endtab %}
 {% endtabs %}
 
-## Make your first request
-
-To make your first request, send an authenticated request to the pets endpoint. This will create a `pet`, which is nice.
+## Connect to the Node&#x20;
 
 {% swagger src="https://raw.githubusercontent.com/proxima-one/proxima-db-server/master/src/docs-ui/swagger_output.json" path="/pet" method="post" %}
 [https://raw.githubusercontent.com/proxima-one/proxima-db-server/master/src/docs-ui/swagger_output.json](https://raw.githubusercontent.com/proxima-one/proxima-db-server/master/src/docs-ui/swagger_output.json)
@@ -36,7 +67,7 @@ To make your first request, send an authenticated request to the pets endpoint. 
 {% endswagger %}
 
 {% hint style="info" %}
-**Good to know:** You can use the API Method block to fully document an API method. You can also sync your API blocks with an OpenAPI file or URL to auto-populate them.
+**Good to know:**You can check the connectivity to the node by going through the curl operation.
 {% endhint %}
 
 Take a look at how you might call this method using our official libraries, or via `curl`:
@@ -44,11 +75,7 @@ Take a look at how you might call this method using our official libraries, or v
 {% tabs %}
 {% tab title="curl" %}
 ```
-curl https://api.myapi.com/v1/pet  
-    -u YOUR_API_KEY:  
-    -d name='Wilson'  
-    -d species='dog'  
-    -d owner_id='sha7891bikojbkreuy'  
+curl https://localhost:80 
 ```
 {% endtab %}
 
