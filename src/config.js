@@ -13,6 +13,16 @@ function fromYamlFile(filePath = "./config.yaml") {
 }
 
 
+// function configToJSON(config, filePath = "./config.json") {
+//   const absPath = filePath; //path.resolve(filePath);
+//   console.log(absPath);
+//   if (!fs.existsSync(absPath)) return Empty;
+
+//   const yamlContent = fs.writeFileSync(absPath, "utf8");
+//   return yaml.load(yamlContent.toString("utf8"));
+// }
+
+
 //fromYaml
 //toYAML 
 //output

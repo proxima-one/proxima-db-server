@@ -11,26 +11,40 @@ const {
 } = require("../helpers.js");
 
 class ProximaDBServer {
-  constructor(args) {
+  constructor(args = {}) {
     this.server = new grpc.Server({'grpc.max_send_message_length': 1024*1024*1024});
-    this.db = this.initDB();
-    this.initServer(args);
+    this.db = args.db || this.initDB();
+    this.initServer();
   }
   start() {
     try {
     this.server.start();
+    process.on('SIGINT', () => { this.stop();});
+    process.on('SIGQUIT', () => {this.stop()});
+    process.on('SIGTERM', () => {this.stop()});
     } catch(err) {
       console.log("Error starting gRPC server: ", err.message)
     }
+
+
   }
+
+  stop() { 
+    console.log("Closing grpc server")
+    this.server.tryShutdown(() => {
+      console.log("Grpc server closed")
+    })
+  }
+
+
 
   initDB(args = {}) {
     return new Database(args["hash"], args["bits"], args["db_path"]);
   }
 
   initServer(args = {}) {
-    let ip = args["ip"] || "0.0.0.0";
-    let port = args["port"] || "50051";
+    let ip = "0.0.0.0";
+    let port = "50051";
     this.server.bind(ip + ":" + port, grpc.ServerCredentials.createInsecure());
     this._initServices();
   }

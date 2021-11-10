@@ -7,13 +7,16 @@
 const {parseKey, parseValue, parseProof, parseRoot} = require("../helpers")
 const swaggerFile = require('../docs-ui/swagger_output.json')
 const {Database} = require("../backend/database/database")
+const {Executor} = require("../backend/executor/executor")
 const express = require('express');
 
 const bodyParser = require('body-parser');
 
 const router = express.Router();
 
-const swaggerUi = require('swagger-ui-express')
+const swaggerUi = require('swagger-ui-express');
+const { error } = require("ajv/dist/vocabularies/applicator/dependencies");
+const { program } = require("commander");
 
 
 
@@ -21,32 +24,55 @@ const swaggerUi = require('swagger-ui-express')
 class ProximaDBHttpServer {
     constructor(args) {
       const app = express();
-
-
       const port = 80;
       this.port = 80
-      this.server = app
+      this.app = app
+
       this.db = this.initDB();
+      //console.log(this.db.toJSON())
       this.initServer(args);
     }
     start() {
         this.port = 80
-        this.server.listen(this.port, () => {
-        console.log(`Proxima db app is listening at http://localhost:${this.port}`)
+        this.server = this.app.listen(this.port, () => {
+            console.log(`Proxima db app is running\n`)
         });
+        
+        process.on('SIGINT', async () => { await this.stop();});
+        process.on('SIGQUIT', async () => {await this.stop()});
+        process.on('SIGTERM', async () => {await this.stop()});
+    }
+
+    async stop() {
+        this.server.close(function () {       
+            console.log("Closing database")
+        });
+        this.db.writeToJSON(this.dbConfigPath)
+        await this.db.close()
+        console.log("Database Closed")
     }
   
-    initDB(args = {}) {
-      return new Database("Default");
+    initDB(configPath = "./config.json") {
+      var db
+      try {
+        this.dbConfigPath = "./config.json"
+        db = Database.readFromJSON(configPath)//new Database("Default", config);
+      } catch(e) {
+        let config = {_id: "Default", name: "Default", version: "0.0.0", internal_config: {}}
+        db = new Database("Default", config)
+      }
+      //console.log(db.toJSON())
+      return db
     }
   
     initServer(args = {}) {
       let ip = args["ip"] || "0.0.0.0";
-      let port = args["port"] || "50051";
+      let port = args["port"] || "8080";
       this.port = port 
       this.ip = ip
-      this.server.use(bodyParser.json({limit: '50mb',}));
-      this.server.use(
+      this.executor = new Executor(this.db)
+      this.app.use(bodyParser.json({limit: '50mb',}));
+      this.app.use(
         bodyParser.urlencoded({
             limit: '50mb',
           extended: true,
@@ -58,7 +84,7 @@ class ProximaDBHttpServer {
     }
 
 swaggerDocs() {
-    this.server.use('/doc', swaggerUi.serve, swaggerUi.setup(swaggerFile))
+    this.app.use('/doc', swaggerUi.serve, swaggerUi.setup(swaggerFile))
 }
 
 initRoutes() {
@@ -70,28 +96,28 @@ Routes
 Node
 */
 
-this.server.get('/', (req, res) => {
-    res.json({message: "ok"});
+this.app.get('/', async (req, res) => {
+    res.json(this.db.toJSON());
 })
 
-this.server.post("/", (req, res) => {
+this.app.post("/", (req, res) => {
     try {
         let body = req.body 
         this.db.updateConfig(body)
         res.json(this.db.toJSON())
     } catch (error) {
-        console.log(error)
+        res.json({error: error.message})
     }
-
 })
 
-this.server.put("/", (req, res) => {
+this.app.put("/", (req, res) => {
     try {
         let body = req.body 
         this.db = new Database(body.name, body)
         res.json(body.name)
     } catch (error) {
         console.log(error)
+        res.json("Error: ", error.message)
     }
 })
 
@@ -99,32 +125,62 @@ this.server.put("/", (req, res) => {
 Collections
 */
 
-this.server.get('/collections/:id', (req, res) => {
-    res.json({'message': 'ok'});
+this.app.get('/collections/:id', async (req, res) => {
+    try {
+        let rawTx = {
+            type: "READ",
+            command: "FIND_ONE_COLLECTION",
+            params: {
+                id: req.params.id,
+                name: req.body.name,
+                config: req.body
+            }
+        }
+        let reply = await this.executor.process(rawTx)
+        res.json(reply);
+    } catch(err){
+        res.json({error: err.message})
+    }
 });
 
-this.server.put('/collections/:id', async (req, res) => {
+this.app.put('/collections/:id', async (req, res) => {
     try {
-        let newCollectionResp = await this.db.updateCollectionConfig(req.params.id, req.body)
-        let collection = await this.db.getCollection(req.params.id)
-        res.json({updated: true, collection: req.body})
+        let rawTx = {
+            type: "WRITE",
+            command: "COLLECTION_UPDATE",
+            params: {
+                name: req.params.id,
+                config: req.body
+            }
+        }
+        let reply = await this.executor.process(rawTx)
+        res.json(reply)
     } catch(err) {
-        console.log("Error with getting the database stats: ", err.message)
+        console.log(err.message)
         res.json({updated: false, error: err.message})
     }
 });
 
-this.server.post('/collections', async (req, res) => {
+this.app.post('/collections', async (req, res) => {
     try {
-        let collection = await this.db.createCollection(req.params.id, req.body)
-        res.json({"created": true, "table" :  req.params.id})
+        let rawTx = {
+            type: "WRITE",
+            command: "COLLECTION_CREATE",
+            params: {
+                name: req.body.name,
+                config: req.body
+            }
+        }
+        let reply = await this.executor.process(rawTx)
+       // let collection = await this.db.createCollection(reqBody.name, reqBody)
+        res.json(reply)
     } catch(err) {
-        console.log("Error creating collection: ", err.message)
+        console.log(err.message)
         res.json({"error" : err.message})
     }
 })
 
-this.server.delete('/collections/:id', async (req, res) => {
+this.app.delete('/collections/:id', async (req, res) => {
     try {
         await this.db.deleteCollection(req.params.id)
         res.json({"removed": true, "table name" :  req.params.id})
@@ -134,35 +190,28 @@ this.server.delete('/collections/:id', async (req, res) => {
     }
 })
 
-// this.server.get('/collections/:id/stats', async (req, res) => {
-//     try {
-//         let table = await this.db.get(req.params.id);
-//         let stats =await table.stat()
-//         res.json({"table name" :  req.params.id, "table stats": stats})
-//     } catch(err) {
-//         console.log("Error getting collection: ", err.message)
-//     }
-// })
-
 //collection document 
-this.server.get('/collections/:id/documents/:docId', async (req, res) => {
+this.app.get('/collections/:id/documents/:docId', async (req, res) => {
     try {
-        const table = await this.db.getCollection(req.params.id)
-        let key = parseKey(req.params.docId.toString());
-        let prove = req.params.prove || false;
-        let response = await table.get(key, prove);
-        let reply = {
-          value: response.value,
-          root: parseRoot(response.root),
-          proof: parseProof(response.proof)
-        };
+        let rawTx = {
+            type: "READ",
+            command: "FIND_ONE" ,
+            params: {
+                    collection: req.params.id,
+                    type: "Document",
+                    key: req.params.docId,
+                    prove: req.params.prove
+             }
+        }
+        let reply = await this.executor.process(rawTx)
         res.json(reply)
     } catch(err) {
         console.log("Error getting document: ", err.message)
+        res.json({error: err.message})
     }
 })
 
-    this.server.delete('/collections/:id/documents/:docId', async (req, res) => {
+    this.app.delete('/collections/:id/documents/:docId', async (req, res) => {
         try {
             const table = await this.db.getCollection(req.params.id)
             let key = parseKey(req.params.docId.toString());
@@ -171,138 +220,154 @@ this.server.get('/collections/:id/documents/:docId', async (req, res) => {
             await table.remove(key);
             await table.commit();
             let reply = {
-              key: req.key,
+              key: req.params.key,
               confirmation: true
             };
             res.json(reply)
         } catch(err) {
             console.log("Error deleting document: ", err.message)
+            res.json({error: err.message})
         }
     })
 
 
 
     //insert 
-    this.server.post('/collections/:id/documents', async (req, res) => {
+    this.app.post('/collections/:id/documents', async (req, res) => {
         try {
+
             const table = await this.db.getCollection(req.params.id)
-            //check if 
-            let reqBody = req.body //JSON.parse(req.body)s
-             let key = parseKey(reqBody.key.toString());
-             let value = parseValue(reqBody.value.toString())
-            let prove = reqBody.prove || false;
-            let response = await table.put(key, value, prove);
-            let reply = {
-                value: value,
-                confirmation: true,
-                root: parseRoot(response.root),
-                proof: parseProof(response.proof)
-            };
+            let rawTx = {
+                type: "WRITE",
+                command: "INSERT",
+                params: {
+                    collection: req.params.id,
+                    type: "Document",
+                    key: req.body.key,
+                    value: req.body.value,
+                    prove: req.body.prove || false 
+                }
+            }
+
+            let reply = await this.executor.process(rawTx)
             res.json(reply)
         } catch(err) {
-            console.log("Error inserting documents: ", err.message)
+            console.log("Error inserting document: ", err.message)
+            res.json(err.message)
         }
     })
 
 
 
 
-    this.server.post('/collections/:id/documents/bulkInsert', async (req, res) => {
+    this.app.post('/collections/:id/documents/bulkInsert', async (req, res) => {
         try {
-            const table = await this.db.getCollection(req.params.id)
-            //check if 
-            let reqBody = req.body //JSON.parse(req.body)s
-            const entries = reqBody.entries;
-            let replies = new Array();
-            let tx = await table.transaction();
-            for (var entry of entries) {
-                entry.value = parseValue(entry.value.toString());
-                entry.key = parseKey(entry.key.toString())
-                entry.prove = entry.prove || false;
-                let response = await table.put(entry.key, entry.value, entry.prove);
-                console.log(response)
-              replies.push({
-                key: entry.key,
-                confirmation: true,
-                // proof: parseProof(response.data.proof),
-                // root: parseRoot(response.data.root)
-              });
+            let rawTx = {
+                command: "BULK_UPDATE",
+                type: "WRITE",
+                params: {
+                    collection: req.params.id,
+                    type: "Document",
+                    txs: req.body.entries
+                }
             }
-            let resp = await table.commit();
-            // let key = ;
-            // let prove = reqBody.prove || false;
-            // let 
-            // let response = await table.put(key, value, prove);
-            // let reply = {
-            //     value: value,
-            //     confirmation: true,
-            //     root: parseRoot(response.root),
-            //     proof: parseProof(response.proof)
-            // };
-            console.log(replies)
-            res.json(replies)
+            let reply = await this.executor.process(rawTx)
+            res.json(reply)
         } catch(err) {
             console.log("Error inserting documents: ", err.message)
+            res.json({error: err.message})
         }
     })
 
     //update 
-    this.server.put('/collections/:id/documents/:docId', async (req, res) => {
+    this.app.put('/collections/:id/documents/:docId', async (req, res) => {
         try {
-            const table = await this.db.getCollection(req.params.id)
-            let key = parseKey(req.params.docId.toString());
-            let prove = req.params.prove || false;
-            console.log(value)
-            let value = parseValue(req.params.value.toString());
-            let response = await table.put(key, req.params.value, prove);
-            let reply = {
-                value: req.params.value,
-                confirmation: true,
-                root: parseRoot(response.root),
-                proof: parseProof(response.proof)
-            };
+            let rawTx = {
+                type: "WRITE",
+                command: "UPDATE",
+                params: {
+                    collection: req.params.id,
+                    type: "Document",
+                    key: req.params.docId,
+                    value: req.body.value,
+                    prove: req.body.prove
+                }
+            }
+            let reply = await this.executor.process(rawTx)
             res.json(reply)
         } catch(err) {
-            console.log("Error deleting document: ", err.message)
+            console.log("Error updating document: ", err.message)
+            res.json({error: err.message})
         }
     });
 
 
 
     //query
-    this.server.post('/collections/:id/query', async (req, res) => {
+    this.app.post('/collections/:id/query', async (req, res) => {
         try {
-            const table = await this.db.getCollection(req.params.id)
-            let key = parseKey(req.params.key.toString());
-            let query = req.params.query; //"[{\"expression\": \"<\",\"name\":\"numUsers\",\"value\":100}]"
-            let queryJSON = JSON.parse(query);
-            let prove = req.params.prove || false;
-            let limit = req.params.limit || 100;
-            let responses = await table.query(
-              JSON.stringify(queryJSON),
-              limit,
-              prove
-            );
-            let replies = new Array();
-            for (var response of responses) {
-              let root = response.root || "";
-              replies.push({
-                value: parseValue(response.value),
-                proof: parseProof(response.proof),
-                root: parseRoot(response.root)
-              });
+            let rawTx = {
+                type: "READ", 
+                command: "FIND", 
+                params: {
+                    collection: req.params.id,
+                    type: "Document",
+                    query: req.body.query,
+                    limit: req.body.limit,
+                    prove: req.body.prove
+                }
             }
-            let queryReply = {
-              responses: replies
-            };
-            res.json(queryReply)
+            let reply = await this.executor.process(rawTx)
+            res.json(reply)
         } catch(err) {
             console.log("Error with document query: ", err.message)
+            res.json({error: err.message})
         }
     })
 
 
-    this.server.put('/collections/:id/streams/:streamId', async (req, res) => {
+    this.app.put('/collections/:id/streams/:streamId', async (req, res) => {
+        try {
+                let rawTx = {
+                    type: "WRITE",
+                    command: "UPDATE",
+                    params: {
+                        collection: req.params.id,
+                        type: "Stream",
+                        key: req.params.docId,
+                        value: req.body.value,
+                        prove: req.body.prove
+                    }
+                }
+                let reply = await this.executor.process(rawTx)
+                res.json(reply)
+        } catch(err) {
+            console.log("Error deleting document: ", err.message)
+            res.json("Error: ", err.message)
+        }
+    });
+
+    this.app.get('/collections/:id/streams/:messageId', async (req, res) => {
+        try {
+            let rawTx = {
+                type: "READ",
+                command: "FIND_ONE" ,
+                params: {
+                        collection: req.params.id,
+                        type: "Stream",
+                        key: req.params.messageId,
+                        prove: req.params.prove
+                 }
+            }
+            let reply = await this.executor.process(rawTx)
+            res.json(reply)
+        } catch(err) {
+            console.log("Error deleting document: ", err.message)
+            res.json("Error: ", err.message)
+        }
+    });
+
+    this.app.post('/collections/:id/streams/:messageId', async (req, res) => {
         try {
             const table = await this.db.getCollection(req.params.id)
             let key = parseKey(req.params.key.toString());
@@ -319,51 +384,12 @@ this.server.get('/collections/:id/documents/:docId', async (req, res) => {
             res.json(reply)
         } catch(err) {
             console.log("Error deleting document: ", err.message)
-        }
-    });
-
-    this.server.get('/collections/:id/streams/:streamId', async (req, res) => {
-        try {
-            const table = await this.db.getCollection(req.params.id)
-            let key = parseKey(req.params.key.toString());
-
-            let prove = req.params.prove || false;
-            let value = parseValue(req.params.value.toString());
-            let response = await table.put(key, req.params.value, prove);
-            let reply = {
-                value: req.params.value,
-                confirmation: true,
-                root: parseRoot(response.root),
-                proof: parseProof(response.proof)
-            };
-            res.json(reply)
-        } catch(err) {
-            console.log("Error deleting document: ", err.message)
-        }
-    });
-
-    this.server.post('/collections/:id/streams/:streamId', async (req, res) => {
-        try {
-            const table = await this.db.getCollection(req.params.id)
-            let key = parseKey(req.params.key.toString());
-
-            let prove = req.params.prove || false;
-            let value = parseValue(req.params.value.toString());
-            let response = await table.put(key, req.params.value, prove);
-            let reply = {
-                value: req.params.value,
-                confirmation: true,
-                root: parseRoot(response.root),
-                proof: parseProof(response.proof)
-            };
-            res.json(reply)
-        } catch(err) {
-            console.log("Error deleting document: ", err.message)
+            res.json("Error: ", err.message)
         }
     });
 
 
-    this.server.put('/collections/:id/streams/:streamId', async (req, res) => {
+    this.app.put('/collections/:id/streams/:streamId', async (req, res) => {
         try {
             const table = await this.db.getCollection(req.params.id)
             let key = parseKey(req.params.key.toString());
@@ -380,10 +406,11 @@ this.server.get('/collections/:id/documents/:docId', async (req, res) => {
             res.json(reply)
         } catch(err) {
             console.log("Error updating document: ", err.message)
+            res.json({error: err.message})
         }
     });
 
-    this.server.get('/collections/:id/streams/:streamId/commits/:commitId', async (req, res) => {
+    this.app.get('/collections/:id/streams/:streamId/commits/:commitId', async (req, res) => {
         try {
             const table = await this.db.getCollection(req.params.id)
             let key = parseKey(req.params.key.toString());
@@ -399,11 +426,12 @@ this.server.get('/collections/:id/documents/:docId', async (req, res) => {
             };
             res.json(reply)
         } catch(err) {
-            console.log("Error deleting document: ", err.message)
+            console.log("Error: ", err.message)
+            res.json("Error: ", err.message)
         }
     });
 
-    this.server.post('/collections/:id/streams/:streamId/commits', async (req, res) => {
+    this.app.post('/collections/:id/streams/:streamId/commits', async (req, res) => {
         try {
             const table = await this.db.getCollection(req.params.id)
             let key = parseKey(req.params.key.toString());
@@ -419,110 +447,8 @@ this.server.get('/collections/:id/documents/:docId', async (req, res) => {
             };
             res.json(reply)
         } catch(err) {
-            console.log("Error deleting document: ", err.message)
-        }
-    });
-
-    //controllers
-
-    this.server.post('/controllers/:controllerId', async (req, res) => {
-        try {
-            const table = await this.db.getCollection(req.params.id)
-            let key = parseKey(req.params.key.toString());
-
-            let prove = req.params.prove || false;
-            let value = parseValue(req.params.value.toString());
-            let response = await table.put(key, req.params.value, prove);
-            let reply = {
-                value: req.params.value,
-                confirmation: true,
-                root: parseRoot(response.root),
-                proof: parseProof(response.proof)
-            };
-            res.json(reply)
-        } catch(err) {
-            console.log("Error deleting document: ", err.message)
-        }
-    });
-
-
-    this.server.get('/controllers/:controllerId', async (req, res) => {
-        try {
-            const table = await this.db.getCollection(req.params.id)
-            let key = parseKey(req.params.key.toString());
-
-            let prove = req.params.prove || false;
-            let value = parseValue(req.params.value.toString());
-            let response = await table.put(key, req.params.value, prove);
-            let reply = {
-                value: req.params.value,
-                confirmation: true,
-                root: parseRoot(response.root),
-                proof: parseProof(response.proof)
-            };
-            res.json(reply)
-        } catch(err) {
-            console.log("Error deleting document: ", err.message)
-        }
-    });
-
-    this.server.delete('/controllers/:controllerId', async (req, res) => {
-        try {
-            const table = await this.db.getCollection(req.params.id)
-            let key = parseKey(req.params.key.toString());
-
-            let prove = req.params.prove || false;
-            let value = parseValue(req.params.value.toString());
-            let response = await table.put(key, req.params.value, prove);
-            let reply = {
-                value: req.params.value,
-                confirmation: true,
-                root: parseRoot(response.root),
-                proof: parseProof(response.proof)
-            };
-            res.json(reply)
-        } catch(err) {
-            console.log("Error deleting document: ", err.message)
-        }
-    });
-
-    this.server.put('/controllers/:controllerId', async (req, res) => {
-        try {
-            const table = await this.db.getCollection(req.params.id)
-            let key = parseKey(req.params.key.toString());
-
-            let prove = req.params.prove || false;
-            let value = parseValue(req.params.value.toString());
-            let response = await table.put(key, req.params.value, prove);
-            let reply = {
-                value: req.params.value,
-                confirmation: true,
-                root: parseRoot(response.root),
-                proof: parseProof(response.proof)
-            };
-            res.json(reply)
-        } catch(err) {
-            console.log("Error deleting document: ", err.message)
-        }
-    });
-
-    this.server.get('/controllers', async (req, res) => {
-        try {
-            const table = await this.db.getCollection(req.params.id)
-            let key = parseKey(req.params.key.toString());
-
-            let prove = req.params.prove || false;
-            let value = parseValue(req.params.value.toString());
-            let response = await table.put(key, req.params.value, prove);
-            let reply = {
-                value: req.params.value,
-                confirmation: true,
-                root: parseRoot(response.root),
-                proof: parseProof(response.proof)
-            };
-            res.json(reply)
-        } catch(err) {
-            console.log("Error deleting document: ", err.message)
+            console.log("Error: ", err.message)
+            res.json("Error: ", err.message)
         }
     });
 }
