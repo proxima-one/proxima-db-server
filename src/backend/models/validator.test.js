@@ -9,12 +9,13 @@ describe("Model Schema Initialization and Validation", () => {
 
     it("should be able to create and validate a model from a single json-schema", () => {
           const testSchema = {
+            type: "object",
+            description: "Test schema for validation",
             properties: {
-              foo: {type: "int32"}
-            },
-            optionalProperties: {
+              foo: {type: "number"},
               bar: {type: "string"}
-            }
+            },
+            required: ["foo"]
           }
         
         const testSchemaGoodValue = {foo: 1, bar: "abc"}

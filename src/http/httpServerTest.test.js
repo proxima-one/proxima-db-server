@@ -17,75 +17,82 @@ function setup() {
     var config = Config.fromYamlFile(options.configPath);
     config.ip = options.ip;
     config.port = options.port;
+    config.dbConfigPath = "./config.json"
     try {
       const httpServer = new ProximaDBHttpServer(config)
       httpServer.start()
-      return httpServer.server
+      return httpServer
     } catch (err) {
       console.error(`Error creating the http server`, err.message);
     }
 }
 
-var app;
+let server;
+let app;
 
 beforeAll(() => {
-    app = setup()
+    server = setup()
+    app = server.app
 });
+
+afterAll(async () => { 
+   await server.stop()
+})
+
+
+// afterAll(done => {
+//     app.close(done);
+//   });
 
 
 describe("Proxima DB server test, end-to-end documents", () => {
 
-    it("should be able to connect to server from localhost", function (done) {
-        request(app)
+    it("should be able to connect to server from localhost", async () => {
+        let resp = await request(app)
         .get('/')
         .set('Accept', 'application/json')
-        .expect(200, done);
 
     });
 
-    it("should be able to do get operations with database with json schema", function (done) {
-        request(app)
-        .get('/')
-        .set('Accept', 'application/json')
-        .expect(200, done);
-    });
 
-
-    it("should be able to do put operations with database with json schema", function (done) {
+    it("should be able to do put operations with database with json schema", async () => {
         const dbConfig = {
+            _id: "Database_id_1",
             name: "Database",
             version: "0.0.0"
         }
-        request(app)
+        let resp = await request(app)
         .put('/')
         .send(dbConfig)
         .set('Accept', 'application/json')
-        .expect(200, done);
     });
     
-    it("should be able to do update operations with database with json schema", function (done) {
+    it("should be able to do update operations with database with json schema", async () => {
         const dbConfig = {
+            _id: "Database_id",
             name: "Database",
-            version: "0.0.0"
+            owner: "",
+            version: "0.0.1"
         }
-        request(app)
+        let resp = await request(app)
         .post('/')
         .send(dbConfig)
         .set('Accept', 'application/json')
-        .expect(200, done);
     });
 
     describe("Collection CRUD", () => {
 
-        it("should be able to create the collection with json schema", function (done) {
+        it("should be able to create the collection with json schema", async () => {
             let newDocumentSchema = {
                 properties: {
+                   _id: {type: "string"},
                    key: {type: "string"}, 
                    val: {type: "string"}
             }
         }
 
         let collectionConfig = {
+            _id: "collection_id",
             name: "collection",
             version: "0.0.0",
             type: "Document",
@@ -93,89 +100,99 @@ describe("Proxima DB server test, end-to-end documents", () => {
         }
             let collectionName = "collection"
 
-            request(app)
+            let resp = await request(app)
             .post('/collections')
             .send(collectionConfig)
             .set('Accept', 'application/json')
-            .expect(200, done);
         });
 
-        it ("should be able to get the collection JSON schema", function (done) {
+        it ("should be able to get the collection JSON schema", async () => {
             let collectionName = "collection"
-            request(app)
+            let resp = await request(app)
             .get("/collections/" + collectionName)
             .set("Accept", "application/json")
-            .expect(200, done)
         });
 
-        it("should be able to update the collection with JSON schema", function (done) {
+        it("should be able to update the collection with JSON schema", async () => {
             let collectionName = "collection"
             let newDocumentSchema = {
                 properties: {
+                    _id: {type: "string"},
                    key: {type: "string"}, 
                    val: {type: "string"}
             }
         }
 
         let newCollectionConfig = {
+            _id: "collection",
             name: "collection",
             version: "0.0.1",
             type: "Document",
             schema: JSON.stringify(newDocumentSchema)
         }
-            request(app)
+        let resp = await request(app)
             .put('/collections/' + collectionName)
             .send(newCollectionConfig)
             .set('Accept', 'application/json')
-            .expect(200, done);
         });
 
-        it("Should be able to delete a collection", function (done) {
-            let collectionName = "collection"
-            request(app)
-            .delete("/collections/" + collectionName)
-            .set("Accept", "application/json")
-            .expect(200, done)
-        }); 
+        // it("Should be able to delete a collection", function (done) {
+        //     let collectionName = "collection"
+        //     request(app)
+        //     .delete("/collections/" + collectionName)
+        //     .set("Accept", "application/json")
+        //     .expect(200, done)
+        // }); 
 
     })
 
 
-    describe("CRUD for Documents", function (done) {
-        it("Should be able to create schema for documents", function (done) {
+    describe("CRUD for Documents",  () => {
+        it("Should be able to create schema for documents", async () => {
             let collectionName = "collection"
             let newDocumentSchema = {
                 properties: {
+                    _id: {type: "string"},
                    key: {type: "string"}, 
                    val: {type: "string"}
             }
         }
 
         let newCollectionConfig = {
+            _id: "collection",
             name: "collection",
-            version: "0.0.1",
+            version: "0.0.2",
             type: "Document",
             schema: JSON.stringify(newDocumentSchema)
         }
-            request(app)
+        let resp = await request(app)
             .put('/collections/' + collectionName)
             .send(newCollectionConfig)
             .set('Accept', 'application/json')
-            .expect(200, done);
         });
 
-        it("Should be able to insert a new document", function (done) {
+        it("Should be able to insert a new document", async () => {
             let collectionName = "collection"
             let document1 = {
                 key: "Document 1",
-                value: JSON.stringify({"values": "hello"})
+                value: { '_id': 'ID', 'values': 'hello'}
             }
 
-            request(app)
+            let resp = await request(app)
              .post('/collections/' + collectionName + "/documents")
              .send(document1)
              .set('Accept', 'application/json')
-             .expect(200, done)
+        })
+
+
+
+        it("Should be able to query a documents", async () => {
+            let collectionName = "collection"
+            let query = [{name: "id", expression: "=", value: 1}]
+            let queryData = {"query": query}
+
+            let resp = await request(app).post('/collections/' + collectionName + "/query").send(queryData).set('Accept', 'application/json')
+            console.log(resp.data)
         })
 
     })

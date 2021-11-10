@@ -42,7 +42,7 @@ function parseValue(val) {
     value = val;
   }
   if (value.toString().length < 100) return unpack(value.toString(), 100);
-  return unpack(value.toString());
+  return toBytes(value);
 }
 
 function toBytes(str) {

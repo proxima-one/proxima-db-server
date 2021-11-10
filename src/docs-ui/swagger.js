@@ -6,7 +6,7 @@ const endpointsFiles = ['./src/http/index.js']
 
 const doc = {
     info: {
-        version: "1.0.0",
+        version: "1.0.1",
         title: "Proxima DB API",
         description: "Documentation for the http/https server for Proxima Database"
     },

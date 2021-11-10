@@ -42,7 +42,8 @@ function registerDatabaseStartCommand(cmd) {
         const grpcServer = new ProximaDBServer(config);
         grpcServer.start();
       } catch (err) {
-        console.error(`Error creating the gRPC server`, err.message);
+        //console.error(`Error creating the gRPC server`, err.message);
+        grpcServer.stop()
       }
 
       try {
@@ -51,8 +52,6 @@ function registerDatabaseStartCommand(cmd) {
       } catch (err) {
         console.error(`Error creating the http server`, err.message);
       }
-
-      
       //const proximaServerEndpoint = new ProximaServerEndpoint(config);
       //proximaServerEndpoint.start();
     });
@@ -90,6 +89,7 @@ function registerDatabaseBenchCommand(cmd) {
         httpServer.start();
       } catch (err) {
         console.error(`Error creating the http server`, err.message);
+        httpServer.stop()
       }
       //const proximaServerEndpoint = new ProximaServerEndpoint(config);
       //proximaServerEndpoint.start();
@@ -154,6 +154,8 @@ function registerDatabaseLoadTestCommand(cmd) {
       var config = Config.fromYamlFile(options.configPath);
       config.ip = options.ip;
       config.port = options.port;
+
+
       try {
         const grpcServer = new ProximaDBServer(config);
         grpcServer.start();
@@ -171,6 +173,8 @@ function registerDatabaseLoadTestCommand(cmd) {
       //proximaServerEndpoint.start();
     });
 }
+
+
 
 module.exports = {
   registerCommands
