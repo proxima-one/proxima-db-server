@@ -71,7 +71,7 @@ describe("Database Configuration and Model Tests", () => {
             databaseValidator.validate(dbConfigGood)
         })
 
-        it("Should be able to create database from configuration, and that there exists a valid state update, and the json can be printed", () => {
+        it("Should be able to create database from configuration, and that there exists a valid state update, and the json can be printed", async () => {
             let name = "database"
             let dbConfig = {
                 _id: "database_id",
@@ -101,7 +101,7 @@ describe("Database Configuration and Model Tests", () => {
             let dbJSON = database.toJSON()
             var databaseValidator = DatabaseValidator
             assert(databaseValidator.validate(dbJSON))
-            let resp = database.close()
+            let resp = await database.close()
         })
     })
 

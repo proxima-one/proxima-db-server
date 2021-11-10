@@ -44,9 +44,7 @@ class ProximaDBHttpServer {
     }
 
     async stop() {
-        this.server.close(function () {       
-            console.log("Closing database")
-        });
+        this.server.close();
         this.db.writeToJSON(this.dbConfigPath)
         await this.db.close()
         console.log("Database Closed")

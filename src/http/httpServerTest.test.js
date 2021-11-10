@@ -35,8 +35,8 @@ beforeAll(() => {
     app = server.app
 });
 
-afterAll(async() => { 
-    let resp = await server.stop()
+afterAll(async () => { 
+   await server.stop()
 })
 
 
