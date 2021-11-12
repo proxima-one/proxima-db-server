@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "version": "1.0.1",
+    "version": "1.0.2",
     "title": "Proxima DB API",
     "description": "Documentation for the http/https server for Proxima Database"
   },

@@ -1,1 +1,1 @@
-{"_id":"Database_id_1","name":"Database","version":"0.0.1","owner":"","collections":[]}
+{"_id":"Database_id_1","name":"Database","version":"0.0.1","owner":"","collections":[{"_id":"relayer-orders","name":"Relayer-Orders","version":"0.0.0","owner":"","type":"Document","schema":"{\"_id\":{\"type\":\"string\"},\"trader_acc\":{\"type\":\"string\"},\"program_proof\":{\"type\":\"string\"},\"position_size\":{\"type\":\"number\"},\"position_side\":{\"type\":\"number\"}}","internal_config":{}}]}

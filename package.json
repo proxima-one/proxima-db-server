@@ -5,7 +5,7 @@
   "main": "./src/index.js",
   "scripts": {
     "start": "node ./src/index.js start",
-    "swagger-autogen": "node ./src/docs-ui/swagger.js",
+    "swagger-autogen": "node ./src/endpoints/swagger/swagger.js",
     "run": "docker run -d --name=proxima -v proxima-vol:/app/DB proxima-db-1:latest",
     "test": "jest",
     "load-test": "k6 run --vus 1 --duration 120m ./k6/load.js"
