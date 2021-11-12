@@ -166,6 +166,7 @@ this.app.post('/collections', async (req, res) => {
                 config: req.body
             }
         }
+        
         let reply = await this.executor.process(rawTx)
         res.json({updated: true, name: req.body.name, collection: req.body})
     } catch(err) {

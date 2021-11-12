@@ -1,11 +1,7 @@
 const axios = require('axios');
 
 const { TransactionModelSchema } = require("../backend/models/models");
-<<<<<<< HEAD
 const prod = "https://proxima-db.cluster.stage.proxima.one"
-=======
-const prod = "https://proxima-db.cluster.prod.proxima.one"
->>>>>>> b5785d4dff497d9809057fd5942370dd24e8ee02
 const local = "http://0.0.0.0:80"
 
 const traderOrder = {"TraderAccount":{
@@ -55,7 +51,6 @@ const relayerSchema = {
     "position_side": {type: "number" }
 }
 
-<<<<<<< HEAD
 
 let base_uri = local
 
@@ -67,17 +62,6 @@ async function collectionCreation() {
     //curl http://0.0.0.0:80/collections/Relayer-Orders
     let collectionGetResponse = await axios.get("http://0.0.0.0:80/collections/Relayer-Orders")
     console.log("Get Collection Response: ", response.data)
-=======
-let base_uri = local //prod
-
-async function collectionCreation() {
-    //curl -H 'Content-Type: application/json' -d '{name:}
-    let response = await axios.post(base_uri + "/collections", {_id: "relayer-orders", name: "Relayer-Orders", version: "0.0.0", type: "Document", schema: JSON.stringify(relayerSchema)})
-    console.log(response.data)
-    //curl http://0.0.0.0:80/collections/Relayer-Orders
-    let collectionGetResponse = await axios.get("http://0.0.0.0:80/collections/Relayer-Orders")
-    console.log(collectionGetResponse.data)
->>>>>>> b5785d4dff497d9809057fd5942370dd24e8ee02
 }
 
 async function addRelayerOrders() {
