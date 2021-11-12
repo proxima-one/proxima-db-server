@@ -3,9 +3,9 @@
  */
 
 const request = require('supertest');
-const { ProximaDBServer } = require("../servers/newServer.js");
+const { ProximaDBServer } = require("../../servers/newServer.js");
 const {start, ProximaDBHttpServer} = require(".");
-const Config = require("../config")
+const Config = require("../../config")
 
 
 function setup() {
@@ -104,6 +104,9 @@ describe("Proxima DB server test, end-to-end documents", () => {
             .post('/collections')
             .send(collectionConfig)
             .set('Accept', 'application/json')
+            expect(resp.body).toHaveProperty("updated", true)
+            expect(resp.body).toHaveProperty("collection")
+            expect(resp.body).toHaveProperty("name", collectionName)
         });
 
         it ("should be able to get the collection JSON schema", async () => {
@@ -111,6 +114,8 @@ describe("Proxima DB server test, end-to-end documents", () => {
             let resp = await request(app)
             .get("/collections/" + collectionName)
             .set("Accept", "application/json")
+            expect(resp.body).toHaveProperty("collection")
+            expect(resp.body).toHaveProperty("name", collectionName)
         });
 
         it("should be able to update the collection with JSON schema", async () => {
@@ -134,15 +139,38 @@ describe("Proxima DB server test, end-to-end documents", () => {
             .put('/collections/' + collectionName)
             .send(newCollectionConfig)
             .set('Accept', 'application/json')
+            //console.log(resp.body)
+            expect(resp.body).toHaveProperty("updated", true)
         });
 
-        // it("Should be able to delete a collection", function (done) {
-        //     let collectionName = "collection"
-        //     request(app)
-        //     .delete("/collections/" + collectionName)
-        //     .set("Accept", "application/json")
-        //     .expect(200, done)
-        // }); 
+
+        it("Should be able to delete a collection", async () => {
+            let collectionName = "collection"
+            let newDocumentSchema = {
+                properties: {
+                    _id: {type: "string"},
+                   key: {type: "string"}, 
+                   val: {type: "string"}
+            }
+        }
+            let resp = await request(app)
+            .delete("/collections/" + collectionName)
+            .set("Accept", "application/json")
+            expect(resp.body).toHaveProperty("removed", true)
+
+            let newCollectionConfig = {
+                _id: "collection",
+                name: "collection",
+                version: "0.0.1",
+                type: "Document",
+                schema: JSON.stringify(newDocumentSchema)
+            }
+            resp = await request(app)
+                .post('/collections')
+                .send(newCollectionConfig)
+                .set('Accept', 'application/json')
+            expect(resp.body).toHaveProperty("updated", true)
+            });
 
     })
 
@@ -169,30 +197,52 @@ describe("Proxima DB server test, end-to-end documents", () => {
             .put('/collections/' + collectionName)
             .send(newCollectionConfig)
             .set('Accept', 'application/json')
+
+            expect(resp.body).toHaveProperty("updated", true)
         });
 
         it("Should be able to insert a new document", async () => {
             let collectionName = "collection"
             let document1 = {
+                _id: "Document 1",
                 key: "Document 1",
-                value: { '_id': 'ID', 'values': 'hello'}
+                value: { _id: "ID", val: 100, position_size: 10000}
             }
 
             let resp = await request(app)
              .post('/collections/' + collectionName + "/documents")
              .send(document1)
              .set('Accept', 'application/json')
+             expect(resp.body).toHaveProperty("value")
+             expect(resp.body).toHaveProperty("proof")
+             expect(resp.body).toHaveProperty("root")
+             expect(typeof resp.body.value).toBe("object")
         })
 
 
 
         it("Should be able to query a documents", async () => {
             let collectionName = "collection"
-            let query = [{name: "id", expression: "=", value: 1}]
+            let query = [{name: "position_size", expression: ">", value: 0}]
             let queryData = {"query": query}
+            let document1 = {
+                _id: "Document1",
+                key: "Document1",
+                value: { "_id": "Document1","trader_acc": "Account 1",
+                "program_proof": "Relayer Proof", "val": 100, "position_size": 10000}
+            }
 
+            let insertResp = await request(app)
+             .post('/collections/' + collectionName + "/documents")
+             .send(document1)
+             .set('Accept', 'application/json')
             let resp = await request(app).post('/collections/' + collectionName + "/query").send(queryData).set('Accept', 'application/json')
-            console.log(resp.data)
+            //console.log(resp.body)
+            
+            expect(resp.body).toHaveProperty("responses")
+            expect(resp.body.responses).toHaveLength(1)
+
+     
         })
 
     })

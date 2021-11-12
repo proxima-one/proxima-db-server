@@ -4,10 +4,10 @@
  */
 
 //const { Database, Table } = require("proxima-db");
-const {parseKey, parseValue, parseProof, parseRoot} = require("../helpers")
-const swaggerFile = require('../docs-ui/swagger_output.json')
-const {Database} = require("../backend/database/database")
-const {Executor} = require("../backend/executor/executor")
+const {parseKey, parseValue, parseProof, parseRoot} = require("../../helpers")
+const swaggerFile = require('../swagger/swagger_output.json')
+const {Database} = require("../../backend/database/database")
+const {Executor} = require("../../backend/executor/executor")
 const express = require('express');
 
 const bodyParser = require('body-parser');
@@ -17,9 +17,6 @@ const router = express.Router();
 const swaggerUi = require('swagger-ui-express');
 const { error } = require("ajv/dist/vocabularies/applicator/dependencies");
 const { program } = require("commander");
-
-
-
 
 class ProximaDBHttpServer {
     constructor(args) {
@@ -45,7 +42,6 @@ class ProximaDBHttpServer {
 
     async stop() {
         this.server.close();
-        this.db.writeToJSON(this.dbConfigPath)
         await this.db.close()
         console.log("Database Closed")
     }
@@ -134,10 +130,11 @@ this.app.get('/collections/:id', async (req, res) => {
                 config: req.body
             }
         }
-        let reply = await this.executor.process(rawTx)
+        let getReply = await this.executor.process(rawTx)
+        let reply = {exists: (getReply != null), collection: getReply}
         res.json(reply);
     } catch(err){
-        res.json({error: err.message})
+        res.json({exists: false, name: req.params.id, collection: null, error: err.message})
     }
 });
 
@@ -155,7 +152,7 @@ this.app.put('/collections/:id', async (req, res) => {
         res.json(reply)
     } catch(err) {
         console.log(err.message)
-        res.json({updated: false, error: err.message})
+        res.json({updated: false, name: req.params.id, error: err.message})
     }
 });
 
@@ -170,21 +167,20 @@ this.app.post('/collections', async (req, res) => {
             }
         }
         let reply = await this.executor.process(rawTx)
-       // let collection = await this.db.createCollection(reqBody.name, reqBody)
-        res.json(reply)
+        res.json({updated: true, name: req.body.name, collection: req.body})
     } catch(err) {
-        console.log(err.message)
-        res.json({"error" : err.message})
+        console.log("Error getting document: ", err.message)
+        res.json({updated: false, name: req.body.name, error : err.message})
     }
 })
 
 this.app.delete('/collections/:id', async (req, res) => {
     try {
-        await this.db.deleteCollection(req.params.id)
-        res.json({"removed": true, "table name" :  req.params.id})
+        let resp = await this.db.deleteCollection(req.params.id)
+        res.json({removed: true, collection: req.params.id})
     } catch(err) {
         console.log("Error deleting collection: ", err.message)
-        res.json({updated: false, error: err.message})
+        res.json({removed: false, collection: req.params.id, error: err.message})
     }
 })
 
@@ -233,8 +229,6 @@ this.app.get('/collections/:id/documents/:docId', async (req, res) => {
     //insert 
     this.app.post('/collections/:id/documents', async (req, res) => {
         try {
-
-            const table = await this.db.getCollection(req.params.id)
             let rawTx = {
                 type: "WRITE",
                 command: "INSERT",
@@ -243,7 +237,7 @@ this.app.get('/collections/:id/documents/:docId', async (req, res) => {
                     type: "Document",
                     key: req.body.key,
                     value: req.body.value,
-                    prove: req.body.prove || false 
+                    prove: req.body.prove
                 }
             }
 
@@ -251,7 +245,7 @@ this.app.get('/collections/:id/documents/:docId', async (req, res) => {
             res.json(reply)
         } catch(err) {
             console.log("Error inserting document: ", err.message)
-            res.json(err.message)
+            res.json({Error: err.message})
         }
     })
 

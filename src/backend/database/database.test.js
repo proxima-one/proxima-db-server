@@ -8,12 +8,11 @@ const {Database, Collection, DatabaseValidator} = require("./database")
 const {CollectionValidator} = require("../models/validator")
 const { fstat, fchown } = require("fs-extra")
 const fs = require("fs-extra")
+const { ProximaDBHttpServer } = require("../../endpoints/rest")
 
 const dbConfigBad = {
     version: "0.0.0"
 }
-
-
 
 const dbConfigGood = {
     _id: "database_id",
@@ -62,8 +61,9 @@ const collectionConfigGood = {
     schema: JSON.stringify(documentSchemaGood)
 }
 
-describe("Database Configuration and Model Tests", () => {
-    describe("Main Database Tests", () => {
+
+
+describe("Main Database Tests", () => {
        
         it ("Should validate database configuration based on good and bad config values", () => {
             var databaseValidator = DatabaseValidator
@@ -127,7 +127,6 @@ describe("Database Configuration and Model Tests", () => {
                 type: "Document",
                 schema: JSON.stringify(documentSchemaGood)
             }
-
             let filePath = "./config.json"
             fs.removeSync(filePath)
             let database = new Database(name, dbConfigGood) 
@@ -147,8 +146,6 @@ describe("Database Configuration and Model Tests", () => {
             let collections = await databaseReplica.getCollections()
             assert(collections)
             let resp = await database.close()
-
-
             // let resp = await database.deleteCollection(name)
             // assert(resp)
         });
@@ -266,8 +263,46 @@ describe("Database Configuration and Model Tests", () => {
         }); 
     });
 
+describe("Document and transaction Tests", () => {
+    it("Should ensure that all operations return the correct encoding for documents", async () => {
+        let dbConfig = {
+            _id: "database_id",
+            name: "database",
+            version: "0.0.0"
+        }
+
+        let newDocumentSchema = {
+            properties: {
+                _id: {type: "string"},
+               key: {type: "string"}, 
+               val: {type: "string"}
+        },
+        required: ["_id"]
+    }
+
+    let collectionConfig = {
+        _id: "collection_id",
+        name: "collection1",
+        version: "0.0.1",
+        type: "Document",
+        schema: JSON.stringify(newDocumentSchema)
+    }
+        
+        let database = new Database(dbConfig.name, dbConfig) 
+        let createCollectionTx = {
+            type: "WRITE", 
+            command: "COLLECTION_CREATE",
+            params: {
+                name: "collection1",
+                config: collectionConfig
+            }
+        }
+
+        let createCollectionResp = await database.update(createCollectionTx)
+        console.log(createCollectionResp)
+        assert(createCollectionResp == true)
+        let resp = await database.close()
 
 
-
-
+    })
 })

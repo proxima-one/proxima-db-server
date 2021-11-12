@@ -1,3 +1,4 @@
+const { isString } = require("mocha/lib/utils")
 const {parseKey, parseValue, parseProof, parseRoot} = require("../../helpers")
 
 class Executor {
@@ -13,9 +14,9 @@ class Executor {
         //ensure json 
         //ensure params 
         let tx = rawTx
-        Object.keys(rawTx.params).map((name) => {
-            tx.params[name] = this._parseTxParam(name, rawTx.params[name])
-         })
+        for (const [name, value] of Object.entries(rawTx.params)) {
+            tx.params[name] = this._parseTxParam(name, value)
+          }
         return tx
     }
 
@@ -23,16 +24,16 @@ class Executor {
         var returnValue;
         switch(name) {
             case "key": 
-                returnValue = parseKey(value.toString())
+                returnValue = parseKey(toString(value))
                 break
             case "value":
-                returnValue = parseValue(JSON.stringify(value))
+                returnValue = parseValue(toString(value))
                 break
             case "limit": 
                 returnValue = value || 100 
                 break
             case "prove":
-                returnValue = value || false 
+                returnValue = value || false
                 break
             case "query": 
                 returnValue = value
@@ -89,10 +90,11 @@ class Executor {
     }
 
     parseRawResponse(rawResponse) {
-        let response = rawResponse
-        Object.keys(rawResponse).map((name) => {
-            response[name] = this._parseResponseParam(name, rawResponse[name])
-         })
+        var response = {}
+        for (const key of Object.keys(rawResponse)) {
+            response[key] = this._parseResponseParam(key, rawResponse[key])
+          }
+
         return response
     }
 
@@ -100,48 +102,77 @@ class Executor {
         var returnValue;
         switch(name) {
             case "key":
-                returnValue = value.toString()
+                returnValue = toString(value)
                 break;
             case "root":
                 returnValue = parseRoot(value)
                 break
             case "value":
-                returnValue = value.toString()
+                returnValue = toJSON(value)
+                break
+            case "proof": 
+                returnValue = toString(value)
                 break
             case "query":
                 returnValue = value
                 break
             case "error":
-                returnValue = value
+                returnValue = "None" || value 
                 break
             default:
                 returnValue = value
+                break
         }
         return returnValue
     }
+}
 
+function toJSON(rawValue) {
+    if (Buffer.isBuffer(rawValue)){
+        value = JSON.parse(toString(rawValue))
+        return value
+    }
 
+    if (typeof rawValue == "string") {
+        return JSON.parse(rawValue)
+    } 
 
-    // execute(tx) {
-    //     //collection 
+    if (typeof rawValue == "buffer") {
+        return JSON.parse(toString(rawValue))
+    } 
 
-    //     //read request
+    if (typeof rawValue == "object") {
+        return rawValue
+    }
+    return JSON.parse(toString(rawValue))
+}
 
-    //     //write request
-    // }
+function stringClean(rawString) {
+    return rawString.split("\x00").join("").replace(/^[\s\uFEFF\xA0\0]+|[\s\uFEFF\xA0\0]+$/g, "")
+}
 
-    // journal(tx) {
-    //     //collection 
-    //     //journal
-    // }
-
-    // update(tx) {
-    //     this.db.update(tx)
-    // }
-
-    // query(request) {
-    //     this.db.query(tx)
-    // }
+function toString(rawValue) {
+    var value;
+    if (Buffer.isBuffer(rawValue)){
+        
+        value = rawValue.toString("utf8")
+        return stringClean(value)
+    }
+    switch (typeof rawValue) {
+        case "string":
+            value = rawValue.toString()
+            break
+        case "object":
+            value = JSON.stringify(rawValue)
+            break
+        case "buffer":
+            value = rawValue.toString()
+            break
+        default:
+            value = rawValue.toString()
+            break
+    }
+    return stringClean(value)
 }
 
 module.exports = {Executor}

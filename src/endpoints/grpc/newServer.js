@@ -8,9 +8,9 @@ const {
   parseKey,
   parseValue,
   parseRoot
-} = require("../helpers.js");
+} = require("../../helpers.js");
 
-class ProximaDBServer {
+class ProximaDBGRPCServer {
   constructor(args = {}) {
     this.server = new grpc.Server({'grpc.max_send_message_length': 1024*1024*1024});
     this.db = args.db || this.initDB();
@@ -24,6 +24,7 @@ class ProximaDBServer {
     process.on('SIGTERM', () => {this.stop()});
     } catch(err) {
       console.log("Error starting gRPC server: ", err.message)
+      this.stop()
     }
   }
 
@@ -33,8 +34,6 @@ class ProximaDBServer {
       console.log("Grpc server closed")
     })
   }
-
-
 
   initDB(args = {}) {
     return new Database(args["hash"], args["bits"], args["db_path"]);
