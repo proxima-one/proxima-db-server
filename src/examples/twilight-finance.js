@@ -1,7 +1,11 @@
 const axios = require('axios');
 
 const { TransactionModelSchema } = require("../backend/models/models");
+<<<<<<< HEAD
+const prod = "https://proxima-db.cluster.stage.proxima.one"
+=======
 const prod = "https://proxima-db.cluster.prod.proxima.one"
+>>>>>>> b5785d4dff497d9809057fd5942370dd24e8ee02
 const local = "http://0.0.0.0:80"
 
 const traderOrder = {"TraderAccount":{
@@ -51,6 +55,19 @@ const relayerSchema = {
     "position_side": {type: "number" }
 }
 
+<<<<<<< HEAD
+
+let base_uri = local
+
+async function collectionCreation() {
+    //curl -H 'Content-Type: application/json' -d '{name:}
+    //console.log(JSON.stringify(relayerSchema))
+    let response = await axios.post(base_uri + "/collections", {_id: "relayer-orders", name: "Relayer-Orders", version: "0.0.0", type: "Document", schema: JSON.stringify(relayerSchema)})
+    console.log("Insert Collection Response: ", response.data)
+    //curl http://0.0.0.0:80/collections/Relayer-Orders
+    let collectionGetResponse = await axios.get("http://0.0.0.0:80/collections/Relayer-Orders")
+    console.log("Get Collection Response: ", response.data)
+=======
 let base_uri = local //prod
 
 async function collectionCreation() {
@@ -60,6 +77,7 @@ async function collectionCreation() {
     //curl http://0.0.0.0:80/collections/Relayer-Orders
     let collectionGetResponse = await axios.get("http://0.0.0.0:80/collections/Relayer-Orders")
     console.log(collectionGetResponse.data)
+>>>>>>> b5785d4dff497d9809057fd5942370dd24e8ee02
 }
 
 async function addRelayerOrders() {
@@ -75,8 +93,7 @@ async function addRelayerOrders() {
     //update
     //curl -H 'Content-Type: application/json' -d '{"key": "first", "value": {"_id": "first", "trader_acc": "Account 1", "program_proof": "Relayer Proof", "position_size": 100000, "position_side": -1}, "prove": true}' -XPOST http://0.0.0.0:80/collections/Relayer-Orders/documents
     let response = await axios.post(base_uri + "/collections/Relayer-Orders/documents", {_id: "first", key: "first", value: relayer1})
-    console.log(response.data)
-    //console.log(response.error)
+    console.log("Insert Document Response: ", response.data)
 
     //bulkInsert
     response = await axios.post(base_uri + "/collections/Relayer-Orders/documents/bulkInsert", {entries: [{_id: "first", key: "first", value: relayer1}]})
@@ -90,7 +107,7 @@ async function queries() {
     console.log(response.data)
     //query
     let queryResponse = await axios.post(base_uri + "/collections/Relayer-Orders/query", {query: [{"name": "position_size", "expression": ">", "value": 100}, {"name": "position_side", "expression": "=", "value": -1}]})
-    console.log(queryResponse.data.responses)
+    console.log(queryResponse.data)
     //curl -H 'Content-Type: application/json' -d '{"query": [{"name": "position_side", "expression": "<", "value": 100}]}' -XPOST  http://0.0.0.0:80/collections/Relayer-Orders/query
 }
 

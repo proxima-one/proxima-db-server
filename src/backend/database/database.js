@@ -24,6 +24,7 @@ class Database {
             this.collections = Object.assign({}, ...config.collections.map((collectionConfig) => 
                 ({[collectionConfig.name]: (new Collection(this, collectionConfig.name, collectionConfig))})))
         }
+        this.dbConfigPath = "./config.json";
     }
 
     async close() {
@@ -31,8 +32,8 @@ class Database {
             let collections = await this.getCollections()
         for (const [name, collection] of Object.entries(collections)) {
             let resp = await collection.close()
-
         }
+        this.writeToJSON(this.dbConfigPath)
         } catch (e) {
             console.log("Error Closing collection: ", e)
         }
@@ -66,7 +67,8 @@ class Database {
         var reply;
         switch(tx.command) {
             case "FIND_ONE_COLLECTION":
-                reply = await this.getCollection(tx.name)
+                let getReply = await this.getCollection(tx.params.name)
+                reply = getReply
                 break
             case "FIND_COLLECTION": 
                 reply = await this.getCollections()
@@ -86,9 +88,12 @@ class Database {
     }
 
     updateConfig(config = {}) {
+        //assign properties
+        
         if (Database.validator.validate(config) && this.canUpdateConfig(config)) {
             this.name = config.name
             this.version = config.version
+            this.owner = this.owner 
             return true
         } else {
             return false
@@ -135,13 +140,19 @@ class Database {
 
     async deleteCollection(name) {
         if (name in this.collections) {
-            this.collections[name] = null
+            delete this.collections[name]
             await fs.remove("./DB/" + name)
+            return true 
         }
+        return false
     }
 
     toJSON() {
         return {_id: this._id, name: this.name, version: this.version, owner: this.owner, collections: Object.values(this.collections).map(collection => collection.toJSON())}
+    }
+
+    fromJSONo(obj) {
+        return new Database(obj.name, obj)
     }
 
     static readFromJSON(jsonFile = "./DB/config.json") {
@@ -156,7 +167,7 @@ class Database {
     writeToJSON(jsonFile = "./DB/config.json") {
         let dbJSON = this.toJSON()
         let jsonText = JSON.stringify(dbJSON)
-        fs.writeFileSync(jsonFile, jsonText)
+        fs.outputFileSync(jsonFile, jsonText)
         return true
     }
 }
@@ -196,6 +207,7 @@ class Collection {
     updateConfig(config = {}) {
         if (Collection.collection_validator.validate(config) && this.canUpdateConfig(config)) {
         this.version = config.version
+        
         if (config.schema) {
             this.updateValidator(config.schema)
         }
@@ -207,6 +219,7 @@ class Collection {
     updateValidator(schemaObj) {
         if (schemaObj != "") {
             this.validator = new ModelValidator(JSON.parse(schemaObj))
+            this.schema = schemaObj
         }
     }
 
@@ -253,12 +266,11 @@ class Collection {
     async _bulkUpdate(txs) {
         const table = await this.db.db.get(this.name)
         const entries = txs
-        console.log(txs)
         let replies = new Array();
         let tx = await table.transaction();
         for (var entry of entries) {
-            console.log("Entry key: ", entry.key)
-            console.log("Entry value: ", entry.value)
+            //console.log("Entry key: ", entry.key)
+            //console.log("Entry value: ", entry.value)
             let value = parseValue(JSON.stringify(entry.value));
             entry.key = parseKey(entry.key.toString())
             entry.prove = entry.prove || false;
@@ -280,7 +292,7 @@ class Collection {
         let response = await table.put(key, value, prove);
         let reply = {
             confirmation: true,
-            value: value,
+            value: value.toString(),
             root: response.root,
             proof: response.proof,
             error: null
@@ -291,12 +303,12 @@ class Collection {
     async _insert(key, value, prove) {
         let table = await this.db.db.get(this.name)
        let response = await table.put(key, value, prove);
-       
        let reply = {
-           value: value.toString(),
+           value: value,
            confirmation: true,
-           root: parseRoot(response.root),
-           proof: JSON.parse(parseProof(response.proof).toString() || "{}")
+           root: response.root,
+           proof: JSON.parse(parseProof(response.proof).toString() || "{}"),
+           error: null
        };
        return reply
     }
@@ -319,14 +331,15 @@ class Collection {
         let table = await this.db.db.get(this.name)
         let response = await table.get(key, prove);
         let reply = {
-          value: JSON.parse(response.value.toString()),
-          root: parseRoot(response.root),
+          value: response.value,
+          root: response.root,
           proof: JSON.parse(parseProof(response.proof).toString() || "{}")
         };
         return reply
     }
 
     async _find(query, prove, limit) {
+        try {
         let table = await this.db.db.get(this.name)
         let responses = await table.query(
           JSON.stringify(query),
@@ -343,11 +356,21 @@ class Collection {
           });
         }
         let queryReply = {
+            error: null,
           query: query,
           responses: replies
         };
         return queryReply
+    } catch(e) {
+        console.log(e)
+       let queryErrorReply = {
+           error: e.message,
+        query: query,
+        responses: []
+      }
+      return queryErrorReply
     }
+}
 
     async _delete(key, prove) {
         const table = await this.db.db(this.name)

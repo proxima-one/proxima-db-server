@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "version": "1.0.0",
+    "version": "1.0.2",
     "title": "Proxima DB API",
     "description": "Documentation for the http/https server for Proxima Database"
   },
@@ -26,51 +26,13 @@
         "parameters": [],
         "responses": {}
       },
+      "post": {
+        "tags": [],
+        "description": "",
+        "parameters": [],
+        "responses": {}
+      },
       "put": {
-        "tags": [],
-        "description": "",
-        "parameters": [],
-        "responses": {}
-      },
-      "post": {
-        "tags": [],
-        "description": "",
-        "parameters": [],
-        "responses": {}
-      }
-    },
-    "/stats": {
-      "get": {
-        "tags": [],
-        "description": "",
-        "parameters": [],
-        "responses": {}
-      }
-    },
-    "/health": {
-      "get": {
-        "tags": [],
-        "description": "",
-        "parameters": [],
-        "responses": {}
-      }
-    },
-    "/collections": {
-      "get": {
-        "tags": [],
-        "description": "",
-        "parameters": [],
-        "responses": {}
-      },
-      "post": {
-        "tags": [],
-        "description": "",
-        "parameters": [],
-        "responses": {}
-      }
-    },
-    "collections/stats": {
-      "get": {
         "tags": [],
         "description": "",
         "parameters": [],
@@ -78,6 +40,31 @@
       }
     },
     "/collections/{id}": {
+      "get": {
+        "tags": [],
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "obj",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {}
+      },
       "put": {
         "tags": [],
         "description": "",
@@ -105,16 +92,22 @@
         "responses": {}
       }
     },
-    "/collections/{id}/stats": {
-      "get": {
+    "/collections": {
+      "post": {
         "tags": [],
         "description": "",
         "parameters": [
           {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
+            "name": "obj",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "example": "any"
+                }
+              }
+            }
           }
         ],
         "responses": {}
@@ -174,6 +167,21 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "obj",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "value": {
+                  "example": "any"
+                },
+                "prove": {
+                  "example": "any"
+                }
+              }
+            }
           }
         ],
         "responses": {}
@@ -189,6 +197,51 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "obj",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "key": {
+                  "example": "any"
+                },
+                "value": {
+                  "example": "any"
+                },
+                "prove": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/collections/{id}/documents/bulkInsert": {
+      "post": {
+        "tags": [],
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "obj",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "entries": {
+                  "example": "any"
+                }
+              }
+            }
           }
         ],
         "responses": {}
@@ -204,6 +257,24 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "obj",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "example": "any"
+                },
+                "limit": {
+                  "example": "any"
+                },
+                "prove": {
+                  "example": "any"
+                }
+              }
+            }
           }
         ],
         "responses": {}
@@ -228,7 +299,9 @@
           }
         ],
         "responses": {}
-      },
+      }
+    },
+    "/collections/{id}/streams/{messageId}": {
       "get": {
         "tags": [],
         "description": "",
@@ -240,7 +313,7 @@
             "type": "string"
           },
           {
-            "name": "streamId",
+            "name": "messageId",
             "in": "path",
             "required": true,
             "type": "string"
@@ -259,7 +332,7 @@
             "type": "string"
           },
           {
-            "name": "streamId",
+            "name": "messageId",
             "in": "path",
             "required": true,
             "type": "string"
@@ -313,68 +386,6 @@
             "type": "string"
           }
         ],
-        "responses": {}
-      }
-    },
-    "/controllers/{controllerId}": {
-      "post": {
-        "tags": [],
-        "description": "",
-        "parameters": [
-          {
-            "name": "controllerId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {}
-      },
-      "get": {
-        "tags": [],
-        "description": "",
-        "parameters": [
-          {
-            "name": "controllerId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {}
-      },
-      "delete": {
-        "tags": [],
-        "description": "",
-        "parameters": [
-          {
-            "name": "controllerId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {}
-      },
-      "put": {
-        "tags": [],
-        "description": "",
-        "parameters": [
-          {
-            "name": "controllerId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {}
-      }
-    },
-    "/controllers": {
-      "get": {
-        "tags": [],
-        "description": "",
-        "parameters": [],
         "responses": {}
       }
     }

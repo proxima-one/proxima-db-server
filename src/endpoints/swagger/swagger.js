@@ -1,12 +1,12 @@
 const swaggerAutogen = require('swagger-autogen')()
 
-const outputFile = './src/docs-ui/swagger_output.json'
-const endpointsFiles = ['./src/http/index.js']
+const outputFile = './src/endpoints/swagger/swagger_output.json'
+const endpointsFiles = ['./src/endpoints/rest/index.js']
 
 
 const doc = {
     info: {
-        version: "1.0.1",
+        version: "1.0.2",
         title: "Proxima DB API",
         description: "Documentation for the http/https server for Proxima Database"
     },

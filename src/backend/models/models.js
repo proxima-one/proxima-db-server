@@ -101,5 +101,21 @@ const TransactionModelSchema = {
     required: ["type", "command"]
 }
 
+const ResponseModelSchema = {
+    schema: "https://json-schema.org/draft/2020-12/schema",
+    title: "Response",
+    type: "object",
+    description: "Generalized schema for responses",
+    properties: {
+        //transaction: 
+        outcome: {type: "string"},
+        timestamp: {type: "datetime"}
+
+
+    },
+    additionalProperties: true,
+    required: ["outcome", "timestamp"]
+}
+
 
 module.exports = {NoModelSchema, TransactionModelSchema, MessageModelSchema, DocumentModelSchema, DatabaseModelSchema, DEFAULT_DB_CONFIG, DEFAULT_COLLECTION_CONFIG, CollectionModelSchema}
