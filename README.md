@@ -1,65 +1,33 @@
-# Proxima DB Server
+# Welcome!
 
-The Proxima DB Server is intended to be used for interactions with multiple languages through grpc protocol.
+## Welcome to Proxima DB
 
-<!--
-protoc --go_out=. --go_opt=paths=source_relative \
-    --go-grpc_out=. --go-grpc_opt=paths=source_relative \
-    helloworld/helloworld.proto
+The authenticated data structures within this repo are integral. They feature several components:
 
--->
+* Authenticated Data store
+* Transaction Manager
+* Query Operator
 
+When these are combined we create a powerful nosql database that can be authenticated through its merkle proof.
 
-## Set-up
+## Want to jump right in?
 
-```
-yarn install 
-```
+Jump in to the quick start docs and get making your first request:
 
+{% content-ref url="quick-start.md" %}
+[quick-start.md](quick-start.md)
+{% endcontent-ref %}
 
-### Run 
-```
-yarn run start
-```
+## Check out Tutorials
 
-### Load Testing 
-```
-yarn run load-test
-```
+{% content-ref url="tutorials/" %}
+[tutorials](tutorials/)
+{% endcontent-ref %}
 
+## Want to deep dive?
 
-## Installation
+Dive a little deeper and start exploring our API reference to get an idea of everything that's possible with the API
 
-### Docker
-
-```
-docker pull chasesmith95/proxima-db-server:latest
-```
-
-### NPM
-
-```
-npm install proxima-db-server
-```
-
-## Start
-
-Default server configuration:
-
-IP: `0.0.0.0`
-Port: `50051`
-
-### Docker
-```
-docker run -p 50051:50051 chasesmith95/proxima-db-server:latest
-```
-
-### NPM
-
-```
-npm start
-```
-
-## Usage
-
-- [Go Client]()
+{% content-ref url="reference/api-reference/" %}
+[api-reference](reference/api-reference/)
+{% endcontent-ref %}

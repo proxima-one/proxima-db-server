@@ -25,6 +25,15 @@ class ProximaDBServer {
     } catch(err) {
       console.log("Error starting gRPC server: ", err.message)
     }
+
+
+  }
+
+  stop() { 
+    console.log("Closing grpc server")
+    this.server.tryShutdown(() => {
+      console.log("Grpc server closed")
+    })
   }
 
   stop() { 

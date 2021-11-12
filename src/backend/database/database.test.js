@@ -8,7 +8,10 @@ const {Database, Collection, DatabaseValidator} = require("./database")
 const {CollectionValidator} = require("../models/validator")
 const { fstat, fchown } = require("fs-extra")
 const fs = require("fs-extra")
+<<<<<<< HEAD
 const { ProximaDBHttpServer } = require("../../endpoints/rest")
+=======
+>>>>>>> b5785d4dff497d9809057fd5942370dd24e8ee02
 
 const dbConfigBad = {
     version: "0.0.0"
@@ -127,6 +130,10 @@ describe("Main Database Tests", () => {
                 type: "Document",
                 schema: JSON.stringify(documentSchemaGood)
             }
+<<<<<<< HEAD
+=======
+
+>>>>>>> b5785d4dff497d9809057fd5942370dd24e8ee02
             let filePath = "./config.json"
             fs.removeSync(filePath)
             let database = new Database(name, dbConfigGood) 
@@ -146,6 +153,11 @@ describe("Main Database Tests", () => {
             let collections = await databaseReplica.getCollections()
             assert(collections)
             let resp = await database.close()
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> b5785d4dff497d9809057fd5942370dd24e8ee02
             // let resp = await database.deleteCollection(name)
             // assert(resp)
         });

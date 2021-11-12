@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 const { isString } = require("mocha/lib/utils")
+=======
+>>>>>>> b5785d4dff497d9809057fd5942370dd24e8ee02
 const {parseKey, parseValue, parseProof, parseRoot} = require("../../helpers")
 
 class Executor {
@@ -14,9 +17,15 @@ class Executor {
         //ensure json 
         //ensure params 
         let tx = rawTx
+<<<<<<< HEAD
         for (const [name, value] of Object.entries(rawTx.params)) {
             tx.params[name] = this._parseTxParam(name, value)
           }
+=======
+        Object.keys(rawTx.params).map((name) => {
+            tx.params[name] = this._parseTxParam(name, rawTx.params[name])
+         })
+>>>>>>> b5785d4dff497d9809057fd5942370dd24e8ee02
         return tx
     }
 
@@ -24,16 +33,27 @@ class Executor {
         var returnValue;
         switch(name) {
             case "key": 
+<<<<<<< HEAD
                 returnValue = parseKey(toString(value))
                 break
             case "value":
                 returnValue = parseValue(toString(value))
+=======
+                returnValue = parseKey(value.toString())
+                break
+            case "value":
+                returnValue = parseValue(JSON.stringify(value))
+>>>>>>> b5785d4dff497d9809057fd5942370dd24e8ee02
                 break
             case "limit": 
                 returnValue = value || 100 
                 break
             case "prove":
+<<<<<<< HEAD
                 returnValue = value || false
+=======
+                returnValue = value || false 
+>>>>>>> b5785d4dff497d9809057fd5942370dd24e8ee02
                 break
             case "query": 
                 returnValue = value
@@ -90,11 +110,18 @@ class Executor {
     }
 
     parseRawResponse(rawResponse) {
+<<<<<<< HEAD
         var response = {}
         for (const key of Object.keys(rawResponse)) {
             response[key] = this._parseResponseParam(key, rawResponse[key])
           }
 
+=======
+        let response = rawResponse
+        Object.keys(rawResponse).map((name) => {
+            response[name] = this._parseResponseParam(name, rawResponse[name])
+         })
+>>>>>>> b5785d4dff497d9809057fd5942370dd24e8ee02
         return response
     }
 
@@ -102,21 +129,30 @@ class Executor {
         var returnValue;
         switch(name) {
             case "key":
+<<<<<<< HEAD
                 returnValue = toString(value)
+=======
+                returnValue = value.toString()
+>>>>>>> b5785d4dff497d9809057fd5942370dd24e8ee02
                 break;
             case "root":
                 returnValue = parseRoot(value)
                 break
             case "value":
+<<<<<<< HEAD
                 returnValue = toJSON(value)
                 break
             case "proof": 
                 returnValue = toString(value)
+=======
+                returnValue = value.toString()
+>>>>>>> b5785d4dff497d9809057fd5942370dd24e8ee02
                 break
             case "query":
                 returnValue = value
                 break
             case "error":
+<<<<<<< HEAD
                 returnValue = "None" || value 
                 break
             default:
@@ -173,6 +209,38 @@ function toString(rawValue) {
             break
     }
     return stringClean(value)
+=======
+                returnValue = value
+                break
+            default:
+                returnValue = value
+        }
+        return returnValue
+    }
+
+
+
+    // execute(tx) {
+    //     //collection 
+
+    //     //read request
+
+    //     //write request
+    // }
+
+    // journal(tx) {
+    //     //collection 
+    //     //journal
+    // }
+
+    // update(tx) {
+    //     this.db.update(tx)
+    // }
+
+    // query(request) {
+    //     this.db.query(tx)
+    // }
+>>>>>>> b5785d4dff497d9809057fd5942370dd24e8ee02
 }
 
 module.exports = {Executor}
