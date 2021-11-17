@@ -1,1 +1,1 @@
-{"_id":"Database_id_1","name":"Database","version":"0.0.1","owner":"","collections":[]}
+{"_id":"Database_id_1","name":"Database","version":"0.0.1","owner":"","collections":[{"_id":"Relayer-Orders","name":"Relayer-Orders","version":"0.0.3","owner":"","type":"Document","schema":"","internal_config":{}}]}
