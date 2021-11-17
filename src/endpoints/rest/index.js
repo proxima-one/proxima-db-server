@@ -17,6 +17,7 @@ const router = express.Router();
 const swaggerUi = require('swagger-ui-express');
 const { error } = require("ajv/dist/vocabularies/applicator/dependencies");
 const { program } = require("commander");
+var cors = require('cors');
 
 class ProximaDBHttpServer {
     constructor(args) {
@@ -72,6 +73,7 @@ class ProximaDBHttpServer {
           extended: true,
         })
       );
+      this.app.use(cors());
 
       this.initRoutes()
       this.swaggerDocs()
@@ -166,6 +168,7 @@ this.app.post('/collections', async (req, res) => {
                 config: req.body
             }
         }
+        
         let reply = await this.executor.process(rawTx)
         res.json({updated: true, name: req.body.name, collection: req.body})
     } catch(err) {
