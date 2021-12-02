@@ -1,6 +1,6 @@
 #!/bin/sh
 URL=$1
-URL=${URL:="http://0.0.0.0:80"}
+URL=${URL:="https://proxima-db.cluster.stage.proxima.one"}  #"http://0.0.0.0:80"}
 echo "Connecting to:" $URL
 echo "\n" "####Collections####"
 echo "\n" "Insert Collection" 
