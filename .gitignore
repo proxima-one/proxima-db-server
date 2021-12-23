@@ -4,6 +4,7 @@ npm-debug.log
 .coveralls.yml
 DB/
 coverage/
+src/clients/
 .nyc_output/
 .DS_Store
 .npmignore

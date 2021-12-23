@@ -1,4 +1,8 @@
 ./DB
 .git
+.kube
+.github
+reference
+./src/clients
 README.md
 ./node_modules
