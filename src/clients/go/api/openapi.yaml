@@ -1,0 +1,771 @@
+openapi: 3.0.1
+info:
+  description: Documentation for the http/https server for Proxima Database
+  title: Proxima DB API
+  version: 1.0.3
+servers:
+- url: http://localhost:80/
+- url: https://localhost:80/
+tags: []
+paths:
+  /:
+    get:
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Database'
+          description: Database Node information.
+      tags: []
+    post:
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Database'
+          description: Database updated successfully.
+        "500":
+          content: {}
+          description: Internal Server Error
+      tags: []
+    put:
+      responses:
+        "200":
+          content: {}
+          description: OK
+        "500":
+          content: {}
+          description: Internal Server Error
+      tags: []
+  /collections/{id}:
+    delete:
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content: {}
+          description: OK
+        "500":
+          content: {}
+          description: Internal Server Error
+      tags: []
+    get:
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      requestBody:
+        $ref: '#/components/requestBodies/inline_object'
+        content:
+          application/json:
+            schema:
+              properties:
+                name:
+                  example: any
+                  type: object
+              type: object
+        required: false
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Collection'
+          description: Collection retrieval issue.
+        "500":
+          content: {}
+          description: Internal Server Error
+      tags: []
+      x-codegen-request-body-name: obj
+    put:
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content: {}
+          description: OK
+        "500":
+          content: {}
+          description: Internal Server Error
+      tags: []
+  /collections:
+    post:
+      requestBody:
+        $ref: '#/components/requestBodies/inline_object_1'
+        content:
+          application/json:
+            schema:
+              properties:
+                name:
+                  example: any
+                  type: object
+              type: object
+        required: false
+      responses:
+        "200":
+          content: {}
+          description: OK
+      tags: []
+      x-codegen-request-body-name: obj
+  /collections/{id}/documents/{docId}:
+    delete:
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: docId
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content: {}
+          description: OK
+        "500":
+          content: {}
+          description: Internal Server Error
+      tags: []
+    get:
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: docId
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content: {}
+          description: OK
+        "500":
+          content: {}
+          description: Internal Server Error
+      tags: []
+    put:
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: docId
+        required: true
+        schema:
+          type: string
+      requestBody:
+        $ref: '#/components/requestBodies/inline_object_2'
+        content:
+          application/json:
+            schema:
+              properties:
+                value:
+                  example: any
+                  type: object
+                prove:
+                  example: any
+                  type: object
+              type: object
+        required: false
+      responses:
+        "200":
+          content: {}
+          description: OK
+        "500":
+          content: {}
+          description: Internal Server Error
+      tags: []
+      x-codegen-request-body-name: obj
+  /collections/{id}/documents:
+    post:
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      requestBody:
+        $ref: '#/components/requestBodies/inline_object_3'
+        content:
+          application/json:
+            schema:
+              properties:
+                key:
+                  example: any
+                  type: object
+                value:
+                  example: any
+                  type: object
+                prove:
+                  example: any
+                  type: object
+              type: object
+        required: false
+      responses:
+        "200":
+          content: {}
+          description: OK
+        "500":
+          content: {}
+          description: Internal Server Error
+      tags: []
+      x-codegen-request-body-name: obj
+  /collections/{id}/documents/bulkInsert:
+    post:
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      requestBody:
+        $ref: '#/components/requestBodies/inline_object_4'
+        content:
+          application/json:
+            schema:
+              properties:
+                entries:
+                  example: any
+                  type: object
+              type: object
+        required: false
+      responses:
+        "200":
+          content: {}
+          description: OK
+        "500":
+          content: {}
+          description: Internal Server Error
+      tags: []
+      x-codegen-request-body-name: obj
+  /collections/{id}/query:
+    post:
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      requestBody:
+        $ref: '#/components/requestBodies/inline_object_5'
+        content:
+          application/json:
+            schema:
+              properties:
+                query:
+                  example: any
+                  type: object
+                limit:
+                  example: any
+                  type: object
+                prove:
+                  example: any
+                  type: object
+              type: object
+        required: false
+      responses:
+        "200":
+          content: {}
+          description: OK
+        "500":
+          content: {}
+          description: Internal Server Error
+      tags: []
+      x-codegen-request-body-name: obj
+  /collections/{id}/streams/{streamId}:
+    put:
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: streamId
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content: {}
+          description: OK
+        "500":
+          content: {}
+          description: Internal Server Error
+      tags: []
+  /collections/{id}/streams/{messageId}:
+    get:
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: messageId
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content: {}
+          description: OK
+        "500":
+          content: {}
+          description: Internal Server Error
+      tags: []
+    post:
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: messageId
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content: {}
+          description: OK
+        "500":
+          content: {}
+          description: Internal Server Error
+      tags: []
+  /collections/{id}/streams/{streamId}/commits/{commitId}:
+    get:
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: streamId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: commitId
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content: {}
+          description: OK
+        "500":
+          content: {}
+          description: Internal Server Error
+      tags: []
+  /collections/{id}/streams/{streamId}/commits:
+    post:
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: streamId
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content: {}
+          description: OK
+        "500":
+          content: {}
+          description: Internal Server Error
+      tags: []
+components:
+  requestBodies:
+    inline_object_1:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/inline_object_1'
+      required: false
+    inline_object:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/inline_object'
+      required: false
+    inline_object_5:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/inline_object_5'
+      required: false
+    inline_object_4:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/inline_object_4'
+      required: false
+    inline_object_3:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/inline_object_3'
+      required: false
+    inline_object_2:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/inline_object_2'
+      required: false
+  schemas:
+    Database:
+      example:
+        collections: []
+        name: Test Collection
+        id: Collection-1-id
+        version: 0.0.0
+      properties:
+        id:
+          example: Collection-1-id
+          type: string
+        version:
+          example: 0.0.0
+          type: string
+        name:
+          example: Test Collection
+          type: string
+        collections:
+          example: []
+          items:
+            type: object
+          type: array
+      type: object
+    Collection:
+      example:
+        id: Collection-1-id
+        state:
+          schema: []
+          offset: 0.0
+          name: Test Collection
+          controllers:
+          - Public Key
+          latest_commit: Commit id
+          version: 0.0.0
+      properties:
+        id:
+          example: Collection-1-id
+          type: string
+        state:
+          $ref: '#/components/schemas/Collection_state'
+      type: object
+    AddCollection:
+      properties:
+        id:
+          example: Collection-1-id
+          type: string
+        meta:
+          $ref: '#/components/schemas/AddCollection_meta'
+      type: object
+    Document:
+      properties:
+        id:
+          example: Document 1 id
+          type: string
+        value:
+          example: Document Value
+          type: string
+      type: object
+    AddDocument:
+      properties:
+        key:
+          example: Document 1 id
+          type: string
+        value:
+          example: Value
+          type: string
+      type: object
+    Stream:
+      properties:
+        id:
+          example: Stream-ud
+          type: string
+        state:
+          $ref: '#/components/schemas/Stream_state'
+      type: object
+    Commit:
+      properties:
+        id:
+          example: Commit-id
+          type: string
+        state:
+          $ref: '#/components/schemas/Commit_state'
+      type: object
+    AddCommit:
+      properties:
+        id:
+          example: Commit-id
+          type: string
+        state:
+          $ref: '#/components/schemas/AddCommit_state'
+      type: object
+    Schema:
+      properties:
+        schema:
+          example: https://json-schema.org/draft/2020-12/schema
+          type: string
+        title:
+          example: Schema
+          type: string
+        description:
+          example: A schema object
+          type: string
+        type:
+          example: object
+          type: string
+        properties:
+          properties: {}
+          type: object
+        required:
+          example: []
+          items:
+            type: object
+          type: array
+        tags:
+          example: []
+          items:
+            type: object
+          type: array
+      required:
+      - schema
+      type: object
+    DID:
+      properties:
+        id:
+          example: did:example:123456789abcdefghi
+          type: string
+        authentication:
+          items:
+            $ref: '#/components/schemas/DID_authentication'
+          type: array
+      type: object
+    inline_object:
+      properties:
+        name:
+          example: any
+          type: object
+      type: object
+    inline_object_1:
+      properties:
+        name:
+          example: any
+          type: object
+      type: object
+    inline_object_2:
+      properties:
+        value:
+          example: any
+          type: object
+        prove:
+          example: any
+          type: object
+      type: object
+    inline_object_3:
+      properties:
+        key:
+          example: any
+          type: object
+        value:
+          example: any
+          type: object
+        prove:
+          example: any
+          type: object
+      type: object
+    inline_object_4:
+      properties:
+        entries:
+          example: any
+          type: object
+      type: object
+    inline_object_5:
+      properties:
+        query:
+          example: any
+          type: object
+        limit:
+          example: any
+          type: object
+        prove:
+          example: any
+          type: object
+      type: object
+    Collection_state:
+      example:
+        schema: []
+        offset: 0.0
+        name: Test Collection
+        controllers:
+        - Public Key
+        latest_commit: Commit id
+        version: 0.0.0
+      properties:
+        version:
+          example: 0.0.0
+          type: string
+        name:
+          example: Test Collection
+          type: string
+        controllers:
+          example:
+          - Public Key
+          items:
+            type: string
+          type: array
+        latest_commit:
+          example: Commit id
+          type: string
+        schema:
+          example: []
+          items:
+            type: object
+          type: array
+        offset:
+          example: 0.0
+          type: number
+      type: object
+    AddCollection_meta:
+      properties:
+        schema:
+          example: schema-id
+          type: string
+        controllers:
+          example:
+          - Public Key
+          items:
+            type: string
+          type: array
+        version:
+          example: 0.0.0
+          type: string
+      type: object
+    Stream_state:
+      properties:
+        version:
+          example: 0.0.0
+          type: string
+        controllers:
+          example:
+          - Public Key
+          items:
+            type: string
+          type: array
+        latest_commit:
+          example: Commit id
+          type: string
+        schema:
+          example: schema-id
+          type: string
+        offset:
+          example: 0.0
+          type: number
+      type: object
+    Commit_state:
+      properties:
+        type:
+          example: Genesis
+          type: string
+        version:
+          example: 0.0.0
+          type: string
+        stream_id:
+          example: stream-id
+          type: string
+        commit_link:
+          example: []
+          items:
+            type: object
+          type: array
+        data:
+          example: []
+          items:
+            type: object
+          type: array
+        commit_prev:
+          example: []
+          items:
+            type: object
+          type: array
+        signature:
+          properties: {}
+          type: object
+      type: object
+    AddCommit_state:
+      properties:
+        type:
+          example: Genesis
+          type: string
+        version:
+          example: 0.0.0
+          type: string
+        stream_id:
+          example: stream-id
+          type: string
+        schema:
+          example: schema-id
+          type: string
+        commit_link:
+          example: []
+          items:
+            type: object
+          type: array
+        data:
+          example: []
+          items:
+            type: object
+          type: array
+        commit_prev:
+          example: []
+          items:
+            type: object
+          type: array
+        signature:
+          properties: {}
+          type: object
+      type: object
+    DID_authentication:
+      properties:
+        id:
+          example: did:example:123456789abcdefghi#keys-1
+          type: string
+        type:
+          example: Ed25519VerificationKey2020
+          type: string
+        controller:
+          example: did:example:123456789abcdefghi
+          type: string
+        publicKeyMultibase:
+          example: zH3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV
+          type: string
+      type: object
+x-original-swagger-version: "2.0"

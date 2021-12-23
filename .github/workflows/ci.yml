@@ -10,5 +10,5 @@ jobs:
       - name: Install
         run: yarn install
         
-      - name: Test
+      - name: Server Test
         run: yarn test

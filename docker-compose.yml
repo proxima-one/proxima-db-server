@@ -12,10 +12,10 @@ services:
         ports:
             - "50051:50051"
             - "80:80"
-    proxima-db-test:
-        build:
-            context: .
-            dockerfile: ./docker/proxima-db-testing/Dockerfile
-        image: proximaone/proxima-db-testing:${VERSION:-dev}
+    # proxima-db-test:
+    #     build:
+    #         context: .
+    #         dockerfile: ./docker/proxima-db-testing/Dockerfile
+    #     image: proximaone/proxima-db-testing:${VERSION:-dev}
         # volumes:
         #     - "./test/config.yaml:/app/test/config.yaml"

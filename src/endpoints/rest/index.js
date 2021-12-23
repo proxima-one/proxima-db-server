@@ -93,16 +93,23 @@ Node
 */
 
 this.app.get('/', async (req, res) => {
+/* #swagger.responses[200] = { 
+    schema: { "$ref": "#/definitions/Database" },
+    description: "Database Node information." } */
     res.json(this.db.toJSON());
+    
 })
 
 this.app.post("/", (req, res) => {
     try {
+    /* #swagger.responses[200] = { 
+        schema: { "$ref": "#/definitions/Database" },
+        description: "Database updated successfully." } */
         let body = req.body 
         this.db.updateConfig(body)
-        res.json(this.db.toJSON())
+        res.status(200).json(this.db.toJSON())
     } catch (error) {
-        res.json({error: error.message})
+        res.status(500).json({error: error.message})
     }
 })
 
@@ -110,10 +117,10 @@ this.app.put("/", (req, res) => {
     try {
         let body = req.body 
         this.db = new Database(body.name, body)
-        res.json(body.name)
+        res.status(200).json(body.name)
     } catch (error) {
         console.log(error)
-        res.json("Error: ", error.message)
+        res.status(500).json("Error: ", error.message)
     }
 })
 
@@ -134,9 +141,14 @@ this.app.get('/collections/:id', async (req, res) => {
         }
         let getReply = await this.executor.process(rawTx)
         let reply = {exists: (getReply != null), collection: getReply}
-        res.json(reply);
+        /* #swagger.responses[200] = { 
+           schema: { "$ref": "#/definitions/Collection" },
+           description: "Collection retrieved successfully." } */
+        res.status(200).json(reply);
     } catch(err){
-        res.json({exists: false, name: req.params.id, collection: null, error: err.message})
+        /* #swagger.responses[200] = { 
+           description: "Collection retrieval issue." } */
+        res.status(500).json({exists: false, name: req.params.id, collection: null, error: err.message})
     }
 });
 
@@ -151,10 +163,10 @@ this.app.put('/collections/:id', async (req, res) => {
             }
         }
         let reply = await this.executor.process(rawTx)
-        res.json(reply)
+        res.status(200).json(reply)
     } catch(err) {
         console.log(err.message)
-        res.json({updated: false, name: req.params.id, error: err.message})
+        res.status(500).json({updated: false, name: req.params.id, error: err.message})
     }
 });
 
@@ -170,7 +182,7 @@ this.app.post('/collections', async (req, res) => {
         }
         
         let reply = await this.executor.process(rawTx)
-        res.json({updated: true, name: req.body.name, collection: req.body})
+        res.status(200).json({updated: true, name: req.body.name, collection: req.body})
     } catch(err) {
         console.log("Error getting document: ", err.message)
         res.json({updated: false, name: req.body.name, error : err.message})
@@ -180,10 +192,10 @@ this.app.post('/collections', async (req, res) => {
 this.app.delete('/collections/:id', async (req, res) => {
     try {
         let resp = await this.db.deleteCollection(req.params.id)
-        res.json({removed: true, collection: req.params.id})
+        res.status(200).json({removed: true, collection: req.params.id})
     } catch(err) {
         console.log("Error deleting collection: ", err.message)
-        res.json({removed: false, collection: req.params.id, error: err.message})
+        res.status(500).json({removed: false, collection: req.params.id, error: err.message})
     }
 })
 
@@ -201,10 +213,10 @@ this.app.get('/collections/:id/documents/:docId', async (req, res) => {
              }
         }
         let reply = await this.executor.process(rawTx)
-        res.json(reply)
+        res.status(200).json(reply)
     } catch(err) {
         console.log("Error getting document: ", err.message)
-        res.json({error: err.message})
+        res.status(500).json({error: err.message})
     }
 })
 
@@ -220,10 +232,10 @@ this.app.get('/collections/:id/documents/:docId', async (req, res) => {
               key: req.params.key,
               confirmation: true
             };
-            res.json(reply)
+            res.status(200).json(reply)
         } catch(err) {
             console.log("Error deleting document: ", err.message)
-            res.json({error: err.message})
+            res.status(500).json({error: err.message})
         }
     })
 
@@ -245,10 +257,10 @@ this.app.get('/collections/:id/documents/:docId', async (req, res) => {
             }
 
             let reply = await this.executor.process(rawTx)
-            res.json(reply)
+            res.status(200).json(reply)
         } catch(err) {
             console.log("Error inserting document: ", err.message)
-            res.json({Error: err.message})
+            res.status(500).json({Error: err.message})
         }
     })
 
@@ -267,10 +279,10 @@ this.app.get('/collections/:id/documents/:docId', async (req, res) => {
                 }
             }
             let reply = await this.executor.process(rawTx)
-            res.json(reply)
+            res.status(200).json(reply)
         } catch(err) {
             console.log("Error inserting documents: ", err.message)
-            res.json({error: err.message})
+            res.status(500).json({error: err.message})
         }
     })
 
@@ -289,10 +301,10 @@ this.app.get('/collections/:id/documents/:docId', async (req, res) => {
                 }
             }
             let reply = await this.executor.process(rawTx)
-            res.json(reply)
+            res.status(200).json(reply)
         } catch(err) {
             console.log("Error updating document: ", err.message)
-            res.json({error: err.message})
+            res.status(500).json({error: err.message})
         }
     });
 
@@ -313,10 +325,10 @@ this.app.get('/collections/:id/documents/:docId', async (req, res) => {
                 }
             }
             let reply = await this.executor.process(rawTx)
-            res.json(reply)
+            res.status(200).json(reply)
         } catch(err) {
             console.log("Error with document query: ", err.message)
-            res.json({error: err.message})
+            res.status(500).json({error: err.message})
         }
     })
 
@@ -335,10 +347,10 @@ this.app.get('/collections/:id/documents/:docId', async (req, res) => {
                     }
                 }
                 let reply = await this.executor.process(rawTx)
-                res.json(reply)
+                res.status(200).json(reply)
         } catch(err) {
             console.log("Error deleting document: ", err.message)
-            res.json("Error: ", err.message)
+            res.status(500).json("Error: ", err.message)
         }
     });
 
@@ -355,10 +367,10 @@ this.app.get('/collections/:id/documents/:docId', async (req, res) => {
                  }
             }
             let reply = await this.executor.process(rawTx)
-            res.json(reply)
+            res.status(200).json(reply)
         } catch(err) {
             console.log("Error deleting document: ", err.message)
-            res.json("Error: ", err.message)
+            res.status(500).json("Error: ", err.message)
         }
     });
 
@@ -376,10 +388,10 @@ this.app.get('/collections/:id/documents/:docId', async (req, res) => {
                 root: parseRoot(response.root),
                 proof: parseProof(response.proof)
             };
-            res.json(reply)
+            res.status(200).json(reply)
         } catch(err) {
             console.log("Error deleting document: ", err.message)
-            res.json("Error: ", err.message)
+            res.status(500).json("Error: ", err.message)
         }
     });
 
@@ -398,10 +410,10 @@ this.app.get('/collections/:id/documents/:docId', async (req, res) => {
                 root: parseRoot(response.root),
                 proof: parseProof(response.proof)
             };
-            res.json(reply)
+            res.status(200).json(reply)
         } catch(err) {
             console.log("Error updating document: ", err.message)
-            res.json({error: err.message})
+            res.status(500).json({error: err.message})
         }
     });
 
@@ -419,10 +431,10 @@ this.app.get('/collections/:id/documents/:docId', async (req, res) => {
                 root: parseRoot(response.root),
                 proof: parseProof(response.proof)
             };
-            res.json(reply)
+            res.status(200).json(reply)
         } catch(err) {
             console.log("Error: ", err.message)
-            res.json("Error: ", err.message)
+            res.status(500).json("Error: ", err.message)
         }
     });
 
@@ -440,10 +452,10 @@ this.app.get('/collections/:id/documents/:docId', async (req, res) => {
                 root: parseRoot(response.root),
                 proof: parseProof(response.proof)
             };
-            res.json(reply)
+            res.status(200).json(reply)
         } catch(err) {
             console.log("Error: ", err.message)
-            res.json("Error: ", err.message)
+            res.status(500).json("Error: ", err.message)
         }
     });
 }

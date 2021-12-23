@@ -1,0 +1,44 @@
+name: autogen & update External Repos
+on:
+  push:
+    branches:
+      - main
+jobs:
+  rebuild-containers:
+    runs-on: ubuntu-latest
+    container: node:14-alpine
+    steps:
+      - uses: actions/checkout@v2
+      - name: Server Rebuild and Publish Docker Container 
+        run: ./publish.sh dev
+  client-autogen:
+    runs-on: ubuntu-latest
+    container: node:14-alpine
+    steps: 
+      - uses: actions/checkout@v2
+
+      - name: Client Autogen from OpenAPI Docs
+        run: ./client-gen.sh
+
+      - name: Client Repo Publish
+        env: 
+          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          https://github.com/proxima-one/proximadb-client-js.git
+          https://github.com/proxima-one/proximadb-client-go.git
+          go get golang.org/x/tools/cmd/goimports
+          npm install
+          npm run generate.go
+          git clone --depth 1 https://$API_TOKEN_GITHUB@github.com/phrase/phrase-go.git clones/go &> /dev/null
+          rsync -a --delete --exclude='.git/' clients/go/ clones/go
+          cd clones/go
+          if [ -n "$(git status --porcelain)" ]; then
+          git config --global user.email "support@phrase.com"
+          git config --global user.name "Phrase"
+          git add .
+          git commit --message "Deploying from  phrase/openapi@${GITHUB_SHA::8}"
+          git push origin master
+          else
+          echo "  No changes, skipping."
+          fi
