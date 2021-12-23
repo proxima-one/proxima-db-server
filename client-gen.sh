@@ -32,3 +32,6 @@ chmod +x ./src/clients/rust/git_push.sh
 cd src/clients/rust
 ./git_push.sh proxima-one proximadb-client-rust "Client Update" "github.com" && git push -f origin master
 cd ../../..
+
+# remove Client Libs 
+rm -rf ./src/clients
