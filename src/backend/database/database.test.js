@@ -71,6 +71,12 @@ describe("Main Database Tests", () => {
             databaseValidator.validate(dbConfigGood)
         })
 
+        it ("Should be able to create multiple databases, with folder as reference for the database itself", () => {
+            var databaseValidator = DatabaseValidator
+            databaseValidator.validate(dbConfigBad)
+            databaseValidator.validate(dbConfigGood)
+        })
+
         it("Should be able to create database from configuration, and that there exists a valid state update, and the json can be printed", async () => {
             let name = "database"
             let dbConfig = {
