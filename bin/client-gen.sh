@@ -10,11 +10,11 @@ rm -rf ./src/clients
 ## Re-generate the Clients for REST
 
 #javascript 
-openapi-generator generate -i ./src/endpoints/swagger/swagger_output.json -g javascript -o ./src/clients/javascript
-chmod +x ./src/clients/javascript/git_push.sh
-cd src/clients/javascript
+# openapi-generator generate -i ./src/endpoints/swagger/swagger_output.json -g javascript -o ./src/clients/javascript
+# chmod +x ./src/clients/javascript/git_push.sh
+# cd src/clients/javascript
 #./git_push.sh proxima-one proximadb-client-js "Client Update" "github.com" && git push -f origin master && yarn publish
-cd ../../..
+# cd ../../..
 #typescript
 openapi-generator generate -i ./src/endpoints/swagger/swagger_output.json -g typescript -o ./src/clients/typescript
 chmod +x ./src/clients/typescript/git_push.sh

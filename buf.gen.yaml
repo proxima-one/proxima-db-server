@@ -5,10 +5,10 @@ plugins:
     out: clients/grpc/js
     opt: import_style=commonjs,binary
 
-  - name: grpc
-    out: clients/grpc/js
-    opt: grpc_js
-    path: grpc_tools_node_protoc_plugin
+  # - name: grpc
+  #   out: clients/grpc/js
+  #   opt: grpc_js
+  #   path: grpc_tools_node_protoc_plugin
 
   - name: ts
     out: clients/grpc/ts
