@@ -3,4 +3,4 @@
 
 
 ## Buf Build 
-buf build && buf generate ./src/proto
+buf build && buf generate ./src/proto/v1
