@@ -23,6 +23,7 @@ if [ "$release_note" = "" ]; then
     echo "[INFO] No command line input provided. Set \$release_note to $release_note"
 fi
 
+cd $repo_location
 # Initialize the local directory as a Git repository
 git init
 
