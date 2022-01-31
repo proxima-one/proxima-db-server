@@ -6,7 +6,7 @@
 git_user_id=$1
 git_repo_id=$2
 release_note=$3
-repo_location=$4
+repo_location=$5
 
 if [ "$git_user_id" = "" ]; then
     git_user_id="GIT_USER_ID"
@@ -50,4 +50,4 @@ git pull origin master
 
 # Pushes (Forces) the changes in the local repository up to the remote repository
 echo "Git pushing to https://github.com/${git_user_id}/${git_repo_id}.git"
-git push origin master 2>&1 | grep -v 'To https'
+git push -f origin master 2>&1 | grep -v 'To https'

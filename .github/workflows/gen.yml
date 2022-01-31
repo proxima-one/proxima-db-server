@@ -1,21 +1,21 @@
-name: autogen & update External Repos
-on:
-  push:
-    branches:
-      - main
-jobs:
-  rebuild-containers:
-    runs-on: ubuntu-latest
-    container: node:14-alpine
-    steps:
-      - uses: actions/checkout@v2
-      - name: Server Rebuild and Publish Docker Container 
-        run: ./publish.sh dev
-  client-autogen:
-    runs-on: ubuntu-latest
-    container: node:14-alpine
-    steps: 
-      - uses: actions/checkout@v2
+# name: autogen & update External Repos
+# on:
+#   push:
+#     branches:
+#       - main
+# jobs:
+#   rebuild-containers:
+#     runs-on: ubuntu-latest
+#     container: node:14-alpine
+#     steps:
+#       - uses: actions/checkout@v2
+#       - name: Server Rebuild and Publish Docker Container 
+#         run: ./publish.sh dev
+#   client-autogen:
+#     runs-on: ubuntu-latest
+#     container: node:14-alpine
+#     steps: 
+#       - uses: actions/checkout@v2
 
-      - name: Client Autogen from OpenAPI Docs
-        run: ./client-gen.sh
+#       - name: Client Autogen from OpenAPI Docs
+#         run: ./client-gen.sh

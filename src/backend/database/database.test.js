@@ -8,7 +8,7 @@ const {Database, Collection, DatabaseValidator} = require("./database")
 const {CollectionValidator} = require("../models/validator")
 const { fstat, fchown } = require("fs-extra")
 const fs = require("fs-extra")
-const { ProximaDBHttpServer } = require("../../endpoints/rest")
+const { ProximaDBHttpServer } = require("../../api/rest")
 
 const dbConfigBad = {
     version: "0.0.0"
