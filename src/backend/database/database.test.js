@@ -8,7 +8,7 @@ const {Database, Collection, DatabaseValidator} = require("./database")
 const {CollectionValidator} = require("../models/validator")
 const { fstat, fchown } = require("fs-extra")
 const fs = require("fs-extra")
-const { ProximaDBHttpServer } = require("../../endpoints/rest")
+const { ProximaDBHttpServer } = require("../../api/rest")
 
 const dbConfigBad = {
     version: "0.0.0"
@@ -66,6 +66,12 @@ const collectionConfigGood = {
 describe("Main Database Tests", () => {
        
         it ("Should validate database configuration based on good and bad config values", () => {
+            var databaseValidator = DatabaseValidator
+            databaseValidator.validate(dbConfigBad)
+            databaseValidator.validate(dbConfigGood)
+        })
+
+        it ("Should be able to create multiple databases, with folder as reference for the database itself", () => {
             var databaseValidator = DatabaseValidator
             databaseValidator.validate(dbConfigBad)
             databaseValidator.validate(dbConfigGood)

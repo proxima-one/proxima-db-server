@@ -7,7 +7,7 @@
     "start": "node ./src/index.js start",
     "swagger-autogen": "node ./src/endpoints/swagger/swagger.js",
     "run": "docker run -d --name=proxima -v proxima-vol:/app/DB proxima-db-1:latest",
-    "test": "jest",
+    "test": "jest ./src",
     "load-test": "k6 run --vus 1 --duration 120m ./k6/load.js"
   },
   "author": "",
@@ -36,6 +36,7 @@
     "swagger-ui-express": "^4.1.6"
   },
   "devDependencies": {
-    "jest": "^27.2.4"
+    "jest": "^27.2.4",
+    "lerna": "^4.0.0"
   }
 }

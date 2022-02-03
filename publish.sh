@@ -1,10 +1,14 @@
 #!/bin/sh
 
-version="$1"
+## Generate 
+chmod +x ./gen.sh && ./gen.sh 
+## Build 
+chmod +x ./build.sh && ./build.sh
 
-./build.sh $version
-docker tag proximaone/proxima-db:$version us-west4-docker.pkg.dev/wired-framework-311403/proximaone/proxima-db:$version
-docker push us-west4-docker.pkg.dev/wired-framework-311403/proximaone/proxima-db:$version
+## Version 
+chmod +x ./versioning
 
-docker tag proximaone/proxima-db:$version chasesmith95/proxima-db-server:$version
-docker push chasesmith95/proxima-db-server:$version
+## Docker 
+## Helm 
+## Github 
+## Client Packages
