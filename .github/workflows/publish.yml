@@ -1,16 +1,13 @@
 name: publish
-
 on:
   pull_request:
     types: [opened, synchronize]
-    branches:
-      - master
-      - dev
-
+    # branches:
+    #   - master
+    #   - dev
 env:
   REPO_NAME: proxima.one/proxima-db
   TAG_PREFIX: proximadb-
-
 jobs:
   publish:
     if: github.event.pull_request.merged == true
