@@ -2,7 +2,7 @@ name: publish
 
 on:
   pull_request:
-    types: [closed]
+    types: [opened, closed]
     branches:
       - master
       - dev
