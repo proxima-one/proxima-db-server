@@ -28,7 +28,7 @@ jobs:
       - name: Build image
         run: |
           VERSION=$(cat ./VERSION)
-          DOCKER_BUILDKIT=1 docker build . --build-arg BUILD_VERSION=$VERSION --tag image --file ./deployment/Dockerfile --progress=plain --secret id=npmrc,src=$HOME/.npmrc
+          DOCKER_BUILDKIT=1 docker build . --build-arg BUILD_VERSION=$VERSION --tag image --file ./deployment/Dockerfile --target prod --progress=plain --secret id=npmrc,src=$HOME/.npmrc
       - name: Log into registry
         run: docker login -u="${{ secrets.DOCKER_USERNAME }}" -p="${{ secrets.DOCKER_PASSWORD }}" ${{ secrets.DOCKER_REGISTRY_URL }}
 
