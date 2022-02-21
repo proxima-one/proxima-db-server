@@ -54,3 +54,11 @@ jobs:
         with:
           tag: v${{ steps.push-image.outputs.RELEASED_VERSION }}
           message: 'v${{ steps.push-image.outputs.RELEASED_VERSION }}: PR #${{ github.event.pull_request.number }} ${{ github.event.pull_request.title }}'
+  client-gen:
+    runs-on: ubuntu-latest
+    container: node:14-alpine
+    steps: 
+      - uses: actions/checkout@v2
+
+      - name: Build and publish gRPC Clients
+        run: ./client-gen.sh

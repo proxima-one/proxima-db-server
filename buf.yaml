@@ -1,0 +1,11 @@
+version: v1
+name: buf.build/proximaone/dbapis
+lint:
+  use:
+    - DEFAULT
+deps:
+  - buf.build/proximaone/dbapis-collections
+  - buf.build/proximaone/dbapis-transactions
+breaking:
+  use:
+    - FILE

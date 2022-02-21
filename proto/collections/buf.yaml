@@ -1,0 +1,8 @@
+version: v1
+name: buf.build/proximaone/dbapis-collections
+lint:
+  use:
+    - DEFAULT
+breaking:
+  use:
+    - FILE
