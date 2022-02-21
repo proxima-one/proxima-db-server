@@ -1,7 +1,7 @@
 const grpc = require("grpc");
 const { Database, Table } = require("proxima-db");
 const protoLoader = require("@grpc/proto-loader");
-const packageDefinition = protoLoader.loadSync("./src/proto/v1/proxima.proto");
+const packageDefinition = protoLoader.loadSync("./proto/v1/proxima.proto");
 const proximaProto = grpc.loadPackageDefinition(packageDefinition);
 const {
   parseProof,

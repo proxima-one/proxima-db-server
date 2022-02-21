@@ -1,0 +1,5 @@
+version: v1
+directories:
+  - proto/proxima
+  - proto/collections
+  - proto/transactions

@@ -1,0 +1,75 @@
+syntax = 'proto3';
+
+package collections;
+
+service CollectionService {
+  rpc Get (GetCollectionRequest) returns (GetCollectionResponse) {}
+  rpc Remove (RemoveCollectionRequest) returns (RemoveCollectionResponse) {}
+  rpc Batch (BatchCollectionRequest) returns (BatchCollectionResponse) {}
+  rpc Create (CreateCollectionRequest) returns (CreateCollectionResponse) {}
+}
+
+message Collection {
+    string dbId = 1;
+    string id = 2;
+
+}
+
+message GetCollectionRequest {
+    string dbId = 1;
+    string id = 2;
+}
+
+message GetCollectionResponse {
+    Collection collection = 1;
+}
+
+message RemoveCollectionRequest {
+    string dbId = 1;
+    string id = 2;
+}
+
+message RemoveCollectionResponse {
+    bool successful = 1;
+    Collection collection = 2;
+}
+
+message CreateCollectionRequest {
+    string dbId = 1;
+    Collection collection = 2;
+}
+
+message CreateCollectionResponse {
+    Collection collection = 1;
+    bool created = 2;
+}
+
+message BatchCollectionRequest {
+    repeated CreateCollectionRequest requests = 1;
+}
+
+message BatchCollectionResponse {
+    repeated CreateCollectionResponse responses = 1;
+}
+
+message UpdateCollectionRequest {
+    string dbId = 1;
+    string id = 2;
+    Collection collection_update = 3;
+}
+
+message UpdateCollectionResponse {
+    bool successful = 1;
+    Collection updated_collection = 2;
+}
+
+message PutCollectionRequest {
+    string dbId = 1;
+    string id = 2;
+    Collection collection_update = 3;
+}
+
+message PutCollectionResponse {
+    bool successful = 1;
+    Collection updated_collection = 2;
+}

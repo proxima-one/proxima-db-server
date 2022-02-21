@@ -22,43 +22,6 @@ service ProximaService {
 
 }
 
-
-message CollectionGetRequest {
-    string dbId = 1
-    string id = 2
-}
-
-message CollectionGetResponse {
-    Collection collection = 1
-}
-
-message CollectionCreateRequest {
-    string dbId = 1
-    Collection collection = 2
-}
-
-message CollectionCreateResponse {
-    Collection collection = 1 
-    bool created = 2
-}
-
-message CollectionUpdateRequest {
-    string dbId = 1
-    string id = 2
-    Collection collection_update = 3
-}
-
-message CollectionUpdateResponse {
-    bool successful = 1 
-    Collection updated_collection
-}
-
-
-//Collection 
-//Database 
-//Transaction
-
-
 message ScanRequest {
   string name = 1;
   int32 first = 2;
